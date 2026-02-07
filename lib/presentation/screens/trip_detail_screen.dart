@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
@@ -10,25 +11,24 @@ import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 import 'package:mission_5_wanderly/domain/entities/trip_entity.dart';
 import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
-import 'package:provider/provider.dart';
 
-class TripDetailScreen extends StatefulWidget {
+class TripDetailScreen extends ConsumerStatefulWidget {
   final int tripId;
   const TripDetailScreen({super.key, required this.tripId});
 
   @override
-  State<TripDetailScreen> createState() => _TripDetailScreenState(tripId);
+  ConsumerState<TripDetailScreen> createState() =>
+      _TripDetailScreenState(tripId);
 }
 
-class _TripDetailScreenState extends State<TripDetailScreen> {
+class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   final int _tripId;
 
   _TripDetailScreenState(this._tripId);
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.read<TripProvider>();
-    final trip = provider.trips[_tripId];
+    final trip = ref.read(tripListProvider)[_tripId];
     final theme = Theme.of(context);
     final screen = MediaQuery.of(context).size;
     return Scaffold(
@@ -271,7 +271,10 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 onTap: () {
                   context.goNamed(
                     'itinerary',
-                    pathParameters: {'is_view': false.toString()},
+                    pathParameters: {
+                      'is_view': false.toString(),
+                      'id': _tripId.toString(),
+                    },
                   );
                 },
               ),

@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:mission_5_wanderly/core/router/app_router.dart';
 import 'package:mission_5_wanderly/core/themes/app_themes.dart';
-import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
-import 'package:mission_5_wanderly/presentation/providers/user_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:mission_5_wanderly/dependency_injection.dart';
+import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
+import 'package:mission_5_wanderly/domain/entities/user_entity.dart';
 
-void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => TripProvider()),
-        ChangeNotifierProvider(create: (context) => UserProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(ItineraryEntityAdapter());
+  Hive.registerAdapter(UserEntityAdapter());
+
+  final itineraryBox = await Hive.openBox<List>('itineraries');
+  final userBox = await Hive.openBox<UserEntity>('users');
+
+  setup(itineraryBox, userBox);
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

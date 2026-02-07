@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
@@ -8,32 +11,34 @@ import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
 import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
 import 'package:mission_5_wanderly/core/themes/app_colors.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
-import 'package:mission_5_wanderly/domain/entities/trip_entity.dart';
-import 'package:mission_5_wanderly/presentation/providers/user_provider.dart';
+import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
+import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/user_notifier.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
 import 'package:mission_5_wanderly/presentation/widgets/custom_bottom_navbar.dart';
 import 'package:mission_5_wanderly/presentation/widgets/custom_search_bar.dart';
 import 'package:mission_5_wanderly/presentation/widgets/trip_card.dart';
-import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int bottomNavIndex = 0;
+  late List<ItineraryEntity> itineraries;
   TextEditingController searchController = TextEditingController();
 
   GlobalKey<CurvedNavigationBarState> bottomNavKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final screen = MediaQuery.of(context).size;
-    final trips = tripList;
-    final provider = context.read<UserProvider>();
+    final trips = ref.read(tripListProvider);
+    final _userState = ref.watch(userNotifierProvider);
 
     return Scaffold(
       extendBody: true,
@@ -61,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hi, ${provider.loginUser.fullName}!',
+                          'Hi, ${_userState.loginUser!.fullName}!',
                           style: AppTextStyles.bodyMedium,
                         ),
                         Text(
@@ -153,7 +158,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: GestureDetector(
                         onTap: () => context.goNamed(
                           'itinerary',
-                          pathParameters: {'is_view': true.toString()},
+                          pathParameters: {
+                            'is_view': true.toString(),
+                            'id': Random().nextInt(trips.length).toString(),
+                          },
                         ),
                         child: Container(
                           height: 70,
@@ -299,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: List.generate(5, (_) {
                           return Column(
                             children: [
@@ -327,6 +335,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 500,
                   child: ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+
                     itemCount: trips.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(

@@ -5,6 +5,7 @@ import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/themes/app_colors.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 
+// ignore: must_be_immutable
 class GridCard extends StatelessWidget {
   final HeroIcons icon;
   final String? label;

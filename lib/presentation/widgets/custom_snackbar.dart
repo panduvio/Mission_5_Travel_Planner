@@ -24,6 +24,8 @@ class CustomSnackbar {
           SizedBox(width: AppSpacing.s),
           Text(
             message,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: AppTextStyles.bodyMedium.copyWith(
               color: isError
                   ? AppColors.glowingBrakeDisc
