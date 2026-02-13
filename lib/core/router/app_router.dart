@@ -24,6 +24,8 @@ class AppRouter {
         name: 'home',
         builder: (_, __) => const HomeScreen(),
       ),
+      // 💎 Passing parameter via `GoRouter` di sini sangat elegant. 
+      // Memudahkan deep linking di masa depan! 🛤️🔗
       GoRoute(
         path: '/trip_detail/:id',
         name: 'trip_detail',

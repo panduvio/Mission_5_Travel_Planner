@@ -35,6 +35,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // 💎 Header dengan detail destinasi dan tombol back yang elegan.
+            // Penggunaan `HeroIcon` menambah kesan modern pada UI! 🚀🌟
             SizedBox(
               height: 200,
               child: Stack(

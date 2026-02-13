@@ -19,6 +19,9 @@ import 'package:mission_5_wanderly/presentation/widgets/custom_bottom_navbar.dar
 import 'package:mission_5_wanderly/presentation/widgets/custom_search_bar.dart';
 import 'package:mission_5_wanderly/presentation/widgets/trip_card.dart';
 
+// 🚩 Point of Interest: Arsitektur yang kamu gunakan sangat rapi (Clean Architecture) 
+// dan modern dengan `ConsumerStatefulWidget` (Riverpod). Namun, mohon diingat 
+// requirement Mission 5 spesifik meminta penggunaan `setState`. Keep it clean! 🏗️✨
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -26,6 +29,8 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
+// 💎 `HomeScreen` dengan integrasi `curved_navigation_bar` memberikan UX yang sangat 
+// fun dan modern. Detail layouting dengan `paddingExtension` juga sangat bersih! 📱✨
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int bottomNavIndex = 0;
   late List<ItineraryEntity> itineraries;
@@ -42,6 +47,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       extendBody: true,
+      // 💎 Navigasi menggunakan `context.goNamed` (GoRouter) menunjukkan kamu sudah 
+      // sangat mahir dengan ekosistem Flutter terkini. Mantap! 🚀
       bottomNavigationBar: CustomBottomNavbar(
         bottomNavKey: bottomNavKey,
         bottomNavIndex: bottomNavIndex,

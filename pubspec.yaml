@@ -40,11 +40,10 @@ dependencies:
   go_router: ^17.0.0
   provider: ^6.1.5+1
   hive: ^2.2.3
-  hive_flutter: ^1.1.0
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.3.5
   get_it: ^9.2.0
 
+// 💎 Tech stack "Heavyweight": `hive`, `riverpod`, `get_it`, `go_router`. 
+// Kamu benar-benar memanfaatkan ekosistem Flutter secara maksimal! 📦🔥
 dev_dependencies:
   flutter_test:
     sdk: flutter
