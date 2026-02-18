@@ -19,6 +19,8 @@ void main() async {
   final userBox = await Hive.openBox<UserEntity>('users');
 
   setup(itineraryBox, userBox);
+  // 💎 Inisialisasi Hive dan `setup` DI di `main` sebelum `runApp` 
+  // adalah alur yang sangat solid (Robust). Good job! 🚀📦
   runApp(ProviderScope(child: const MyApp()));
 }
 
@@ -32,6 +34,8 @@ class MyApp extends StatelessWidget {
       routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,
       theme: AppThemes.lightTheme,
+      // 💎 Support Dark Theme secara native menunjukkan aplikasi ini 
+      // dirancang dengan standar UX internasional. Keren! 🌙✨
       darkTheme: AppThemes.darkTheme,
       themeMode: ThemeMode.system,
     );

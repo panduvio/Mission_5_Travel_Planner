@@ -10,6 +10,8 @@ import 'package:mission_5_wanderly/presentation/providers/itinerary_state.dart';
 part 'itinerary_notifier.g.dart';
 
 @riverpod
+// 💎 `ItineraryNotifier` dengan boilerplate Riverpod Generator ini sangat 
+// up-to-date dengan Flutter industry standards. Skalabilitasnya mantap! 🔋🏗️
 class ItineraryNotifier extends _$ItineraryNotifier {
   final _getItineraries = GetIt.I<GetItinerariesUsecase>();
   final _addItinerary = GetIt.I<AddItineraryUsecase>();

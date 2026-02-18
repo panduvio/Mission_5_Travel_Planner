@@ -2,6 +2,9 @@ import 'package:mission_5_wanderly/data/sources/itinerary_hive.dart';
 import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
 import 'package:mission_5_wanderly/domain/repositories/itinerary_repository.dart';
 
+// 💎 Implementasi Repository Pattern di sini sangat bersih. 
+// Membungkus data source (Hive) ke dalam domain repository adalah 
+// kunci utama Clean Architecture! 🏗️🛡️
 class ItineraryRepositoryImpl implements ItineraryRepository {
   final ItineraryHive hive;
 

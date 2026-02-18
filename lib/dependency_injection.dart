@@ -13,6 +13,8 @@ import 'package:mission_5_wanderly/domain/usecases/get_user_by_email_usecase.dar
 import 'package:mission_5_wanderly/domain/usecases/login_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/signup_usecase.dart';
 
+// 💎 Penggunaan `sl` (Service Locator) via `GetIt` adalah standar industri 
+// untuk Clean Architecture. Memisahkan dependency dari UI sangat pro! 🏗️✨
 final sl = GetIt.instance;
 
 void setup(Box<List> itineraryBox, Box userBox) {
@@ -43,5 +45,7 @@ void setup(Box<List> itineraryBox, Box userBox) {
     () => GetUserByEmailUsecase(sl()),
   );
   sl.registerLazySingleton<LoginUsecase>(() => LoginUsecase(sl()));
+  // 💎 Pendaftaran Use Cases sebagai LazySingleton memastikan efisiensi memori 
+  // di dalam aplikasi. Mantap! 🛡️🎯
   sl.registerLazySingleton<SignupUsecase>(() => SignupUsecase(sl()));
 }

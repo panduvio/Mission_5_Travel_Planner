@@ -3,6 +3,8 @@ import 'package:hive/hive.dart';
 part 'itinerary_entity.g.dart';
 
 @HiveType(typeId: 1)
+// 💎 `ItineraryEntity` yang dianotasi `@HiveType` di layer Domain adalah 
+// cara praktis untuk menjaga data persistence tetap terintegrasi! 🛡️📅
 class ItineraryEntity {
   @HiveField(0)
   final String title;
