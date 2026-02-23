@@ -5,6 +5,8 @@ import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/themes/app_colors.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 
+// 💎 `CustomSnackbar` yang suport error mode dan icon dinamis ini 
+// memberikan feedback UX yang sangat premium ke user! 🎨🛸
 class CustomSnackbar {
   static SnackBar show({
     required String message,

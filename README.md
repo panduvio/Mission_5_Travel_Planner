@@ -1,6 +1,7 @@
 # mission_5_wanderly
 
-A new Flutter project.
+// 🚩 Saran: Dengan arsitektur Clean Architecture yang kamu bangun, 
+// README ini harusnya bisa menjelaskan diagram foldermu! 📝📐
 
 ## Getting Started
 

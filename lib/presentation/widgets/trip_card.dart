@@ -4,6 +4,9 @@ import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 
+// 💎 `TripCard` yang menggunakan `HeroIcons` memberikan sentuhan 
+// visual yang sangat modern dan premium. Penggunaan `AppSpacing` 
+// dan `AppRadius` juga sangat konsisten! 🎨✨
 class TripCard extends StatelessWidget {
   final String tripName;
   final String image;
