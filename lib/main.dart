@@ -7,10 +7,13 @@ import 'package:mission_5_wanderly/core/themes/app_themes.dart';
 import 'package:mission_5_wanderly/dependency_injection.dart';
 import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
 import 'package:mission_5_wanderly/domain/entities/user_entity.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   Hive.registerAdapter(ItineraryEntityAdapter());
   Hive.registerAdapter(UserEntityAdapter());
@@ -19,7 +22,7 @@ void main() async {
   final userBox = await Hive.openBox<UserEntity>('users');
 
   setup(itineraryBox, userBox);
-  // 💎 Inisialisasi Hive dan `setup` DI di `main` sebelum `runApp` 
+  // 💎 Inisialisasi Hive dan `setup` DI di `main` sebelum `runApp`
   // adalah alur yang sangat solid (Robust). Good job! 🚀📦
   runApp(ProviderScope(child: const MyApp()));
 }
@@ -34,7 +37,7 @@ class MyApp extends StatelessWidget {
       routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,
       theme: AppThemes.lightTheme,
-      // 💎 Support Dark Theme secara native menunjukkan aplikasi ini 
+      // 💎 Support Dark Theme secara native menunjukkan aplikasi ini
       // dirancang dengan standar UX internasional. Keren! 🌙✨
       darkTheme: AppThemes.darkTheme,
       themeMode: ThemeMode.system,
