@@ -80,6 +80,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(itineraryNotifierProvider);
+    //{Inline Review: state.isLoading/state.error sudah tersedia dan perlu dirender sebagai fallback UI yang jelas.}
     final itineraryProvider = ref.read(itineraryNotifierProvider.notifier);
     List<ItineraryEntity> itineraries = List.from(state.itineraries);
     final theme = Theme.of(context);
@@ -244,9 +245,11 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
             GestureDetector(
               onTap: () {
                 setState(() {
+                  //{Inline Review: Hindari mutasi entity langsung di UI; update note sebaiknya lewat notifier agar terpersist konsisten.}
                   itineraries[index].note = activityController.text;
                   activityController.clear();
                 });
+                //{Inline Review: Setelah ubah note, panggil persistence flow (post/update) agar data tidak hilang saat reopen.}
               },
               child: HeroIcon(
                 HeroIcons.checkCircle,
