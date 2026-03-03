@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
+import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
 import 'package:mission_5_wanderly/core/themes/app_colors.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 
@@ -32,7 +33,7 @@ class CustomPopup extends StatelessWidget {
                 : AppTextStyles.bodyLarge,
           ),
         ],
-      ),
+      ).paddingAll(AppSpacing.m),
     );
   }
 }

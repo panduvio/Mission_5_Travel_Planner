@@ -1,27 +1,25 @@
-import 'package:mission_5_wanderly/data/sources/user_hive.dart';
+import 'package:dartz/dartz.dart';
+import 'package:mission_5_wanderly/data/models/user_model.dart';
+import 'package:mission_5_wanderly/data/sources/user_firestore.dart';
 import 'package:mission_5_wanderly/domain/entities/user_entity.dart';
 import 'package:mission_5_wanderly/domain/repositories/user_repository.dart';
 
 class UserRepositoryImpl implements UserRepository {
-  final UserHive hive;
+  final UserFirestore _firestore;
 
-  UserRepositoryImpl(this.hive);
-
-  @override
-  Future<String> login(String email, password) async {
-    final loginMessage = await hive.login(email, password);
-    return loginMessage;
-  }
+  UserRepositoryImpl(this._firestore);
 
   @override
-  Future<bool> signup(UserEntity user) async {
-    final isSignupSuccess = await hive.signup(user);
-    return isSignupSuccess;
-  }
-
-  @override
-  Future<UserEntity> getUserByEmail(String email) async {
-    final user = await hive.getUserByEmail(email);
+  Future<UserEntity> getUserById(String uid) async {
+    final userModel = await _firestore.getUserById(uid);
+    final user = userModel.toEntity();
     return user;
+  }
+
+  @override
+  Future<Unit> postUser(UserEntity user) async {
+    final userModel = UserModel.fromEntity(user);
+    await _firestore.postUser(userModel);
+    return unit;
   }
 }

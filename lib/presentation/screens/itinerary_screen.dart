@@ -6,11 +6,17 @@ import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
 import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
+import 'package:mission_5_wanderly/core/helpers/validator_helper.dart';
 import 'package:mission_5_wanderly/core/themes/app_colors.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
+import 'package:mission_5_wanderly/domain/entities/booking_entity.dart';
 import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
+import 'package:mission_5_wanderly/presentation/providers/booking_notifier.dart';
 import 'package:mission_5_wanderly/presentation/providers/itinerary_notifier.dart';
+import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/user_notifier.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
+import 'package:mission_5_wanderly/presentation/widgets/custom_snackbar.dart';
 import 'package:mission_5_wanderly/presentation/widgets/custom_text_field.dart';
 import 'package:mission_5_wanderly/presentation/widgets/grid_card.dart';
 
@@ -34,7 +40,9 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   _ItineraryScreenState(this.isView, this.tripId);
   TextEditingController activityController = TextEditingController();
   // late List<ItineraryEntity> itineraries;
-  DateTime? selectedDate;
+  DateTimeRange? bookingDateRange;
+  DateTime? selectedActivityDate;
+  String shownActivityDate = 'Pick a date';
   int? expandedIndex;
 
   final Map<String, HeroIcons> activitySet = {
@@ -48,17 +56,34 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     'Art': HeroIcons.paintBrush,
     'Other': HeroIcons.rectangleGroup,
   };
-  Future<void> _selectDate() async {
+  Future<void> _selectActivityDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2027),
+      initialDate: bookingDateRange?.start ?? DateTime.now(),
+      firstDate: bookingDateRange?.start ?? DateTime.now(),
+      lastDate: bookingDateRange?.end ?? DateTime(2027),
     );
 
     setState(() {
-      selectedDate = pickedDate;
+      selectedActivityDate = pickedDate;
+      shownActivityDate =
+          '${selectedActivityDate!.day}/${selectedActivityDate!.month}/${selectedActivityDate!.year}';
     });
+  }
+
+  Future<void> _selectBookingRange() async {
+    final range = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2027),
+      initialDateRange: bookingDateRange,
+    );
+
+    if (range != null) {
+      setState(() {
+        bookingDateRange = range;
+      });
+    }
   }
 
   @override
@@ -81,6 +106,10 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(itineraryNotifierProvider);
     final itineraryProvider = ref.read(itineraryNotifierProvider.notifier);
+    final bookingProvider = ref.read(bookingNotifierProvider.notifier);
+    final hotel = ref.watch(chosenHotelProvider);
+    final trip = ref.watch(tripListProvider)[tripId];
+
     List<ItineraryEntity> itineraries = List.from(state.itineraries);
     final theme = Theme.of(context);
     final List<Map<String, dynamic>> gridItems = [
@@ -119,20 +148,23 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 children: [
                   OutlinedButton(
                     onPressed: () {
-                      isView ? null : _selectDate();
+                      isView ? null : _selectBookingRange();
                     },
 
                     child: Row(
                       children: [
                         Text(
-                          selectedDate != null
-                              ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
+                          bookingDateRange != null
+                              ? '${bookingDateRange!.start.day}/${bookingDateRange!.start.month}/${bookingDateRange!.start.year}'
+                                    ' - '
+                                    '${bookingDateRange!.end.day}/${bookingDateRange!.end.month}/${bookingDateRange!.end.year}'
                               : 'No date selected',
                           style: AppTextStyles.labelLarge.copyWith(
+                            fontSize: 14,
                             color: theme.colorScheme.tertiary,
                           ),
                         ),
-                        SizedBox(width: AppSpacing.s),
+                        SizedBox(width: AppSpacing.xs),
                         HeroIcon(
                           HeroIcons.calendarDays,
                           size: 24,
@@ -141,10 +173,25 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(width: AppSpacing.m),
+                  Spacer(),
                   AppButton(
                     content: isView ? 'Save' : 'Book Now!',
                     onTap: () {
+                      final uid = ref.read(userNotifierProvider).loginUser!.uid;
+                      final expenditure = trip.price + hotel!.price;
+
+                      final booking = BookingEntity(
+                        bookingId: '',
+                        userId: uid,
+                        startDate: bookingDateRange!.start,
+                        endDate: bookingDateRange!.end,
+                        tripName: trip.tripName,
+                        hotelName: hotel.hotelName,
+                        expenditure: expenditure,
+                        itineraries: itineraries,
+                      );
+                      // print('id: $user');
+                      bookingProvider.bookTrip(booking);
                       itineraryProvider.postItinerary(tripId, itineraries);
                       context.goNamed('home');
                     },
@@ -165,13 +212,29 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                     icon: gridItems[index]['icon'],
                     label: gridItems[index]['label'],
                     onTap: () {
-                      itineraries.add(
-                        ItineraryEntity(
-                          title: gridItems[index]['label'],
-                          date: selectedDate ?? DateTime.now(),
-                        ),
+                      final validationMessage = ValidatorHelper.bookingDate(
+                        bookingDateRange?.start,
+                        bookingDateRange?.end,
                       );
-                      itineraryProvider.postItinerary(tripId, itineraries);
+                      if (validationMessage == null) {
+                        itineraries.add(
+                          ItineraryEntity(
+                            title: gridItems[index]['label'],
+                            date:
+                                selectedActivityDate ?? bookingDateRange!.start,
+                          ),
+                        );
+                        itineraryProvider.postItinerary(tripId, itineraries);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          CustomSnackbar.show(
+                            message: validationMessage,
+                            icon: HeroIcons.exclamationCircle,
+                            isError: true,
+                          ),
+                        );
+                        print('test');
+                      }
                     },
                   );
                 },
@@ -220,13 +283,32 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
         side: BorderSide(color: theme.colorScheme.tertiary),
         borderRadius: BorderRadiusGeometry.circular(AppRadius.card),
       ),
-      leading: HeroIcon(activitySet[itineraries[index].title]!),
-      title: Text(itineraries[index].title, style: AppTextStyles.bodyLarge),
+      leading: HeroIcon(
+        activitySet[itineraries[index].title]!,
+        color: theme.colorScheme.tertiary,
+      ),
+      title: Text(
+        '${itineraries[index].title} ($shownActivityDate)',
+        style: AppTextStyles.bodyLarge,
+      ),
       subtitle: Text(itineraries[index].note ?? ''),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          GestureDetector(onTap: onRemove, child: HeroIcon(HeroIcons.trash)),
+          GestureDetector(
+            onTap: () {
+              _selectActivityDate();
+            },
+            child: HeroIcon(
+              HeroIcons.calendarDays,
+              color: theme.colorScheme.tertiary,
+            ),
+          ),
+          SizedBox(width: AppSpacing.m),
+          GestureDetector(
+            onTap: onRemove,
+            child: HeroIcon(HeroIcons.trash, color: theme.colorScheme.tertiary),
+          ),
         ],
       ),
       children: [
