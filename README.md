@@ -5,7 +5,7 @@
 
 ## Struktur
 
-Struktur folder yang saya gunakan pada clean architecture project ini berbasis layer dimana layer terdalam tidak mengetahui logic dari layer di luarnya. Domain merupakan layer terdalam dari clean architecture dan tidak bergantung pada UI dan Database. Selain itu, terdapat folder core sebagai pendukung bussiness logic, UI, ataupun navigasi.
+Struktur folder yang saya gunakan pada clean architecture project ini berbasis layer dimana layer terdalam tidak mengetahui logic dari layer di luarnya. Domain merupakan layer terdalam dari clean architecture dan tidak bergantung pada UI dan Database. Selain itu, terdapat folder core sebagai pendukung bussiness logic, UI, ataupun navigasi. Dependency Injection digunakan agar mengurangi ketergantungan antar kelas
 
 ### Sub-Folder
 
