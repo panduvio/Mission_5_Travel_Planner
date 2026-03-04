@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mission_5_wanderly/core/errors/failure.dart';
 
 abstract class AuthFirebase {
-  Future<UserCredential> userLogin(String email, password);
-  Future<UserCredential> userRegister(String email, password);
+  Future<UserCredential> userLogin(String email, String password);
+  Future<UserCredential> userRegister(String email, String password);
 }
 
 class AuthFirebaseImpl implements AuthFirebase {
@@ -12,9 +12,9 @@ class AuthFirebaseImpl implements AuthFirebase {
   AuthFirebaseImpl(this._firebaseAuth);
 
   @override
-  Future<UserCredential> userLogin(String email, password) async {
+  Future<UserCredential> userLogin(String email, String password) async {
     try {
-      final response = _firebaseAuth.signInWithEmailAndPassword(
+      final response = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -25,9 +25,9 @@ class AuthFirebaseImpl implements AuthFirebase {
   }
 
   @override
-  Future<UserCredential> userRegister(String email, password) {
+  Future<UserCredential> userRegister(String email, String password) async {
     try {
-      final response = _firebaseAuth.createUserWithEmailAndPassword(
+      final response = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -40,15 +40,17 @@ class AuthFirebaseImpl implements AuthFirebase {
   Failure _mapFirebaseAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
-        return AuthFailure('Email is not registered.');
       case 'wrong-password':
-        return AuthFailure('Email or password is incorrect.');
+      case 'invalid-credential': // Add this case
+        return AuthFailure('Email or password incorrect.');
       case 'invalid-email':
-        return AuthFailure('Invalid email format.');
+        return AuthFailure('The email address is badly formatted.');
       case 'email-already-in-use':
-        return AuthFailure('Email is already in use.');
+        return AuthFailure('This email is already registered.');
+      case 'network-request-failed':
+        return AuthFailure('Check your internet connection.');
       default:
-        return AuthFailure('Authentication failed.');
+        return AuthFailure(e.message ?? 'Authentication failed.');
     }
   }
 }

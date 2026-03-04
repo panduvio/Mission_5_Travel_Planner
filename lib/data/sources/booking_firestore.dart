@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mission_5_wanderly/data/models/booking_model.dart';
+import 'package:mission_5_wanderly/data/models/itinerary_model.dart';
 
 abstract class BookingFirestore {
   Future<void> bookTrip(BookingModel booking);
-  Future<void> updateTrip(BookingModel booking);
+  Future<void> updateTrip(String bookingId, List<ItineraryModel> itineraries);
   Future<void> cancelTrip(String bookingId);
   Future<List<BookingModel>> getUserBookings(String uid);
 }
@@ -26,12 +27,15 @@ class BookingFirestoreImpl implements BookingFirestore {
   }
 
   @override
-  Future<void> updateTrip(BookingModel booking) async {
+  Future<void> updateTrip(
+    String bookingId,
+    List<ItineraryModel> itineraries,
+  ) async {
     try {
-      await _db
-          .collection(_collection)
-          .doc(booking.bookingId)
-          .set(booking.toJson());
+      await _db.collection(_collection).doc(bookingId)
+        ..update({
+          'itineraries': itineraries.map((item) => item.toJson()).toList(),
+        });
     } on FirebaseException catch (e) {
       throw Exception(e.message);
     }

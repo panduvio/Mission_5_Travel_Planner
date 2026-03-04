@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
@@ -14,6 +15,7 @@ import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
 import 'package:mission_5_wanderly/presentation/providers/user_notifier.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
+import 'package:mission_5_wanderly/presentation/widgets/custom_popup.dart';
 import 'package:mission_5_wanderly/presentation/widgets/custom_search_bar.dart';
 import 'package:mission_5_wanderly/presentation/widgets/trip_card.dart';
 
@@ -22,7 +24,6 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    TextEditingController searchController = TextEditingController();
     final theme = Theme.of(context);
     final screen = MediaQuery.of(context).size;
     final trips = ref.read(tripListProvider);
@@ -56,8 +57,6 @@ class HomePage extends ConsumerWidget {
                   ),
                 ],
               ),
-              SizedBox(height: AppSpacing.m),
-              CustomSearchBar(controller: searchController),
               SizedBox(height: AppSpacing.m),
               Container(
                 height: 126,
@@ -134,13 +133,7 @@ class HomePage extends ConsumerWidget {
                   SizedBox(width: AppSpacing.s),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => context.goNamed(
-                        'itinerary',
-                        pathParameters: {
-                          'is_view': true.toString(),
-                          'id': Random().nextInt(trips.length).toString(),
-                        },
-                      ),
+                      onTap: () {},
                       child: Container(
                         height: 70,
                         decoration: BoxDecoration(

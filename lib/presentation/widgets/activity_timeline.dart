@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
-import 'package:mission_5_wanderly/core/extensions/media_query_extension.dart';
+import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
+import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
 import 'package:mission_5_wanderly/core/extensions/theme_extension.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
+import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
 
 class ActivityTimeline extends StatelessWidget {
   final int index;
-  const ActivityTimeline({super.key, required this.index});
+  final bool isLast;
+  final ItineraryEntity itinerary;
+  const ActivityTimeline({
+    super.key,
+    required this.index,
+    required this.isLast,
+    required this.itinerary,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +35,7 @@ class ActivityTimeline extends StatelessWidget {
                   color: context.colors.tertiary,
                 ),
               ),
-              index == 2
+              isLast
                   ? SizedBox()
                   : Expanded(
                       child: Container(
@@ -53,8 +62,21 @@ class ActivityTimeline extends StatelessWidget {
                 ),
                 child: ExpansionTile(
                   shape: OutlineInputBorder(borderSide: BorderSide.none),
-                  title: Text('title', style: AppTextStyles.bodyLarge),
-                  children: [Text('notes', style: AppTextStyles.bodyMedium)],
+                  title: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(itinerary.title, style: AppTextStyles.bodyLarge),
+                      Text(
+                        ' (${itinerary.date.day}/${itinerary.date.month}/${itinerary.date.year})',
+                        style: AppTextStyles.bodySmall,
+                      ),
+                    ],
+                  ),
+                  children: [
+                    Text(itinerary.note ?? '', style: AppTextStyles.bodyMedium)
+                        .withAlignment(Alignment.centerLeft)
+                        .paddingTBRL(0, AppSpacing.s, 0, AppSpacing.s),
+                  ],
                 ),
               ),
             ),

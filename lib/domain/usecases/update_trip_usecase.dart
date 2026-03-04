@@ -1,4 +1,5 @@
 import 'package:mission_5_wanderly/domain/entities/booking_entity.dart';
+import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
 import 'package:mission_5_wanderly/domain/repositories/booking_repository.dart';
 
 class UpdateTripUsecase {
@@ -6,7 +7,10 @@ class UpdateTripUsecase {
 
   UpdateTripUsecase(this.repository);
 
-  Future<void> updateTrip(BookingEntity booking) async {
-    await repository.updateTrip(booking);
+  Future<void> updateTrip(
+    String bookingId,
+    List<ItineraryEntity> itineraries,
+  ) async {
+    await repository.updateTrip(bookingId, itineraries);
   }
 }

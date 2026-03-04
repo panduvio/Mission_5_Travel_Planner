@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
@@ -80,21 +81,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(userNotifierProvider, (previous, next) {
-      if (next.message.isEmpty) return;
+      if (next.isLoading && !(previous?.isLoading ?? false)) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => PopScope(
+            canPop: false,
+            child: Center(
+              child: Lottie.asset(
+                'assets/icons/loading_icon.json',
+                width: 150,
+                height: 150,
+              ),
+            ),
+          ),
+        );
+      }
 
-      final isSuccess = next.message == 'Login Success';
+      if (!next.isLoading && (previous?.isLoading ?? false)) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackbar.show(
-          message: next.message,
-          icon: isSuccess ? HeroIcons.checkCircle : HeroIcons.xCircle,
-          isError: !isSuccess,
-        ),
-      );
+      if (next.message.isNotEmpty && next.message != previous?.message) {
+        final isSuccess = next.message.contains('Success');
 
-      if (isSuccess) {
-        clearAllControllers();
-        context.goNamed('home');
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            message: next.message,
+            icon: isSuccess ? HeroIcons.checkCircle : HeroIcons.xCircle,
+            isError: !isSuccess,
+          ),
+        );
+
+        if (isSuccess) {
+          clearAllControllers();
+          context.goNamed('home');
+        }
       }
     });
     return Scaffold(

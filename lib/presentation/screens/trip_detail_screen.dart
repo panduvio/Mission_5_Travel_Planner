@@ -293,6 +293,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                     pathParameters: {
                       'is_view': false.toString(),
                       'id': _tripId.toString(),
+                      'booking_id': 'new',
                     },
                   );
                 },

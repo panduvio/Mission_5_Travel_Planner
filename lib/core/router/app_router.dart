@@ -36,12 +36,17 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: '/itinerary/:is_view/:id',
+        path: '/itinerary/:is_view/:id/:booking_id',
         name: 'itinerary',
         builder: (context, state) {
           final bool isView = state.pathParameters['is_view']! == 'true';
           final int tripId = int.parse(state.pathParameters['id']!);
-          return ItineraryScreen(isView: isView, tripId: tripId);
+          final String bookingId = state.pathParameters['booking_id']!;
+          return ItineraryScreen(
+            isView: isView,
+            tripId: tripId,
+            bookingId: bookingId,
+          );
         },
       ),
       GoRoute(

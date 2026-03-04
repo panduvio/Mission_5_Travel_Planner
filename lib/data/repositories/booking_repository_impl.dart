@@ -1,6 +1,8 @@
 import 'package:mission_5_wanderly/data/models/booking_model.dart';
+import 'package:mission_5_wanderly/data/models/itinerary_model.dart';
 import 'package:mission_5_wanderly/data/sources/booking_firestore.dart';
 import 'package:mission_5_wanderly/domain/entities/booking_entity.dart';
+import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
 import 'package:mission_5_wanderly/domain/repositories/booking_repository.dart';
 
 class BookingRepositoryImpl implements BookingRepository {
@@ -15,9 +17,14 @@ class BookingRepositoryImpl implements BookingRepository {
   }
 
   @override
-  Future<void> updateTrip(BookingEntity booking) async {
-    final bookingModel = BookingModel.fromEntity(booking);
-    await _firestore.updateTrip(bookingModel);
+  Future<void> updateTrip(
+    String bookingId,
+    List<ItineraryEntity> itineraries,
+  ) async {
+    final itineraryModel = itineraries
+        .map((e) => ItineraryModel.fromEntity(e))
+        .toList();
+    await _firestore.updateTrip(bookingId, itineraryModel);
   }
 
   @override

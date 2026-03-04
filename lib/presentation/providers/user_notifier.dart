@@ -15,37 +15,35 @@ class UserNotifier extends _$UserNotifier {
   final _userRegisterUsecase = GetIt.I<UserRegisterUsecase>();
 
   @override
-  UserState build() {
-    return UserState();
-  }
+  UserState build() => UserState();
 
-  Future<void> userLogin(String email, password) async {
+  Future<void> userLogin(String email, String password) async {
+    // Start Loading & Clear old messages
+    state = state.copyWith(isLoading: true, message: '');
+
     final result = await _userLoginUsecase.userLogin(email, password);
 
     result.fold(
-      (failure) {
-        CustomSnackbar.show(
-          message: 'failure.message',
-          icon: HeroIcons.xCircle,
-        );
-      },
-      (user) async {
-        state = state.copyWith(loginUser: user, message: 'Login Success');
-        print('succeed');
-      },
+      (failure) =>
+          state = state.copyWith(isLoading: false, message: failure.message),
+      (user) => state = state.copyWith(
+        isLoading: false,
+        loginUser: user,
+        message: 'Login Success',
+      ),
     );
   }
 
   Future<void> userRegister(UserEntity user, String password) async {
+    state = state.copyWith(isLoading: true, message: '');
+
     final result = await _userRegisterUsecase.userRegister(user, password);
 
     result.fold(
-      (failure) {
-        state = state.copyWith(message: failure.message);
-      },
-      (unit) {
-        state = state.copyWith(message: 'Signup Success');
-      },
+      (failure) =>
+          state = state.copyWith(isLoading: false, message: failure.message),
+      (unit) =>
+          state = state.copyWith(isLoading: false, message: 'Signup Success'),
     );
   }
 }
