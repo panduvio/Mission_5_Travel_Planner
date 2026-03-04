@@ -111,21 +111,17 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     final _itineraryProvider = ref.read(itineraryNotifierProvider.notifier);
     final hotel = ref.watch(chosenHotelProvider);
     final trip = ref.watch(tripListProvider)[tripId];
-    final _updateBooking = ref
-        .read(bookingNotifierProvider)
-        .bookings
-        .firstWhere((booking) => booking.bookingId == _bookingId);
 
     if (isView) {
+      final _updateBooking = ref
+          .read(bookingNotifierProvider)
+          .bookings
+          .firstWhere((booking) => booking.bookingId == _bookingId);
       bookingDateRange = DateTimeRange(
         start: _updateBooking.startDate,
         end: _updateBooking.endDate,
       );
     }
-    final shownBookingDate =
-        '${bookingDateRange!.start.day}/${bookingDateRange!.start.month}/${bookingDateRange!.start.year}'
-        ' - '
-        '${bookingDateRange!.end.day}/${bookingDateRange!.end.month}/${bookingDateRange!.end.year}';
 
     final theme = Theme.of(context);
     final List<Map<String, dynamic>> gridItems = [
@@ -170,7 +166,9 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                       children: [
                         Text(
                           bookingDateRange != null
-                              ? shownBookingDate
+                              ? '${bookingDateRange!.start.day}/${bookingDateRange!.start.month}/${bookingDateRange!.start.year}'
+                                    ' - '
+                                    '${bookingDateRange!.end.day}/${bookingDateRange!.end.month}/${bookingDateRange!.end.year}'
                               : 'No date selected',
                           style: AppTextStyles.labelLarge.copyWith(
                             fontSize: 14,
