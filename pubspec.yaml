@@ -45,6 +45,12 @@ dependencies:
   flutter_riverpod: ^2.6.1
   firebase_core: ^4.4.0
   firebase_auth: ^6.1.4
+  cloud_firestore: ^6.1.2
+  json_annotation: ^4.9.0
+  json_serializable: ^6.9.0
+  dartz: ^0.10.1
+  flutter_svg: ^2.2.3
+  lottie: ^3.3.1
 
 # 💎 Tech stack "Heavyweight": `hive`, `riverpod`, `get_it`, `go_router`.
 # Kamu benar-benar memanfaatkan ekosistem Flutter secara maksimal! 📦🔥
@@ -75,6 +81,9 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/trips/
+    - assets/hotels/
+    - assets/icons/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

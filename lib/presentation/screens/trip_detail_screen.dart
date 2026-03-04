@@ -8,9 +8,11 @@ import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
 import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
 import 'package:mission_5_wanderly/core/themes/app_colors.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
+import 'package:mission_5_wanderly/domain/entities/hotel_entity.dart';
 import 'package:mission_5_wanderly/domain/entities/trip_entity.dart';
 import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
+import 'package:mission_5_wanderly/presentation/widgets/custom_snackbar.dart';
 
 class TripDetailScreen extends ConsumerStatefulWidget {
   final int tripId;
@@ -26,9 +28,12 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
 
   _TripDetailScreenState(this._tripId);
 
+  int hotelChosen = -1;
+
   @override
   Widget build(BuildContext context) {
     final trip = ref.read(tripListProvider)[_tripId];
+    final hotels = ref.watch(filteredHotelProvider(trip.city));
     final theme = Theme.of(context);
     final screen = MediaQuery.of(context).size;
     return Scaffold(
@@ -74,7 +79,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 ],
               ),
             ),
-            _detailContent(trip),
+            _detailContent(trip, hotels),
             Container(
               padding: EdgeInsets.all(AppSpacing.xl),
               color: theme.colorScheme.tertiary,
@@ -193,11 +198,13 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     );
   }
 
-  Widget _detailContent(TripEntity trip) {
+  Widget _detailContent(TripEntity trip, List<HotelEntity> hotels) {
     final theme = Theme.of(context);
+
     return Container(
       padding: EdgeInsets.all(AppSpacing.xl),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(height: AppSpacing.m),
           Row(
@@ -271,11 +278,22 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 buttonColor: AppColors.tooBlueToBeTrue,
                 contentColor: AppColors.white,
                 onTap: () {
+                  if (hotelChosen == -1) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      CustomSnackbar.show(
+                        message: 'Choose a hotel to stay',
+                        icon: HeroIcons.exclamationCircle,
+                        isError: true,
+                      ),
+                    );
+                    return;
+                  }
                   context.goNamed(
                     'itinerary',
                     pathParameters: {
                       'is_view': false.toString(),
                       'id': _tripId.toString(),
+                      'booking_id': 'new',
                     },
                   );
                 },
@@ -295,32 +313,60 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             ).withAlignment(Alignment.center),
           ),
           SizedBox(height: AppSpacing.m),
-          Row(
-            children: [
-              Expanded(
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: AppSpacing.m,
+              mainAxisSpacing: AppSpacing.m,
+              childAspectRatio: 0.85,
+            ),
+            itemCount: hotels.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    hotelChosen = index;
+                    print('tap');
+                  });
+
+                  ref.read(chosenHotelProvider.notifier).state =
+                      hotels[hotelChosen];
+                },
                 child: Container(
                   padding: EdgeInsets.all(AppSpacing.s),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(AppRadius.card),
-                    color: theme.colorScheme.primary,
+                    color: hotelChosen == index
+                        ? theme.colorScheme.tertiary
+                        : theme.colorScheme.primary,
                   ),
                   child: Column(
                     children: [
                       Container(
+                        height: 100,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(AppRadius.card),
                         ),
                         clipBehavior: Clip.hardEdge,
                         child: Image.asset(
-                          'assets/south_korea.jpg',
-                          fit: BoxFit.contain,
+                          hotels[index].image,
+                          fit: BoxFit.fitHeight,
                         ),
                       ),
+                      SizedBox(height: AppSpacing.s),
                       Text(
-                        'Urban Hotel Kyoto Nijo Premium',
+                        hotels[index].hotelName,
                         textAlign: TextAlign.center,
-                        style: AppTextStyles.labelLarge.copyWith(fontSize: 14),
+                        style: AppTextStyles.labelLarge.copyWith(
+                          fontSize: 14,
+                          color: hotelChosen == index
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.tertiary,
+                        ),
                       ),
+                      Spacer(),
                       Row(
                         children: [
                           HeroIcon(
@@ -330,68 +376,128 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                           ),
                           SizedBox(width: AppSpacing.xs),
                           Text(
-                            '4.1/5',
+                            '${hotels[index].rating}/5',
                             style: AppTextStyles.labelMedium.copyWith(
                               fontWeight: FontWeight.w700,
+                              color: hotelChosen == index
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.tertiary,
                             ),
                           ),
                           Spacer(),
-                          Text('Rp 500000', style: AppTextStyles.bodyLarge),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(width: AppSpacing.m),
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.all(AppSpacing.s),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppRadius.card),
-                    color: theme.colorScheme.primary,
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(AppRadius.card),
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                        child: Image.asset(
-                          'assets/south_korea.jpg',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      Text(
-                        'Urban Hotel Kyoto Nijo Premium',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.labelLarge.copyWith(fontSize: 14),
-                      ),
-                      Row(
-                        children: [
-                          HeroIcon(
-                            HeroIcons.star,
-                            style: HeroIconStyle.solid,
-                            color: AppColors.chosGardenMarigold,
-                          ),
-                          SizedBox(width: AppSpacing.xs),
                           Text(
-                            '4.1/5',
-                            style: AppTextStyles.labelMedium.copyWith(
-                              fontWeight: FontWeight.w700,
+                            'Rp ${hotels[index].price}',
+                            style: AppTextStyles.bodyLarge.copyWith(
+                              color: hotelChosen == index
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.tertiary,
                             ),
                           ),
-                          Spacer(),
-                          Text('Rp 500000', style: AppTextStyles.bodyLarge),
                         ],
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: Container(
+          //         padding: EdgeInsets.all(AppSpacing.s),
+          //         decoration: BoxDecoration(
+          //           borderRadius: BorderRadius.circular(AppRadius.card),
+          //           color: theme.colorScheme.primary,
+          //         ),
+          //         child: Column(
+          //           children: [
+          //             Container(
+          //               decoration: BoxDecoration(
+          //                 borderRadius: BorderRadius.circular(AppRadius.card),
+          //               ),
+          //               clipBehavior: Clip.hardEdge,
+          //               child: Image.asset(
+          //                 'assets/south_korea.jpg',
+          //                 fit: BoxFit.contain,
+          //               ),
+          //             ),
+          //             Text(
+          //               'Urban Hotel Kyoto Nijo Premium',
+          //               textAlign: TextAlign.center,
+          //               style: AppTextStyles.labelLarge.copyWith(fontSize: 14),
+          //             ),
+          //             Row(
+          //               children: [
+          //                 HeroIcon(
+          //                   HeroIcons.star,
+          //                   style: HeroIconStyle.solid,
+          //                   color: AppColors.chosGardenMarigold,
+          //                 ),
+          //                 SizedBox(width: AppSpacing.xs),
+          //                 Text(
+          //                   '4.1/5',
+          //                   style: AppTextStyles.labelMedium.copyWith(
+          //                     fontWeight: FontWeight.w700,
+          //                   ),
+          //                 ),
+          //                 Spacer(),
+          //                 Text('Rp 500000', style: AppTextStyles.bodyLarge),
+          //               ],
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //     SizedBox(width: AppSpacing.m),
+          //     Expanded(
+          //       child: Container(
+          //         padding: EdgeInsets.all(AppSpacing.s),
+          //         decoration: BoxDecoration(
+          //           borderRadius: BorderRadius.circular(AppRadius.card),
+          //           color: theme.colorScheme.primary,
+          //         ),
+          //         child: Column(
+          //           children: [
+          //             Container(
+          //               decoration: BoxDecoration(
+          //                 borderRadius: BorderRadius.circular(AppRadius.card),
+          //               ),
+          //               clipBehavior: Clip.hardEdge,
+          //               child: Image.asset(
+          //                 'assets/south_korea.jpg',
+          //                 fit: BoxFit.contain,
+          //               ),
+          //             ),
+          //             Text(
+          //               'Urban Hotel Kyoto Nijo Premium',
+          //               textAlign: TextAlign.center,
+          //               style: AppTextStyles.labelLarge.copyWith(fontSize: 14),
+          //             ),
+          //             Row(
+          //               children: [
+          //                 HeroIcon(
+          //                   HeroIcons.star,
+          //                   style: HeroIconStyle.solid,
+          //                   color: AppColors.chosGardenMarigold,
+          //                 ),
+          //                 SizedBox(width: AppSpacing.xs),
+          //                 Text(
+          //                   '4.1/5',
+          //                   style: AppTextStyles.labelMedium.copyWith(
+          //                     fontWeight: FontWeight.w700,
+          //                   ),
+          //                 ),
+          //                 Spacer(),
+          //                 Text('Rp 500000', style: AppTextStyles.bodyLarge),
+          //               ],
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );

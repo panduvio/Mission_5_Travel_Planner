@@ -64,4 +64,15 @@ class ValidatorHelper {
 
     return null;
   }
+
+  static String? bookingDate(DateTime? startDate, DateTime? endDate) {
+    if (startDate == null || endDate == null) {
+      return "Date range is required";
+    }
+
+    if (endDate.isBefore(startDate)) {
+      return "End date cannot be before start date";
+    }
+    return null;
+  }
 }

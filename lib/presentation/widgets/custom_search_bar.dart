@@ -5,7 +5,15 @@ import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
 
 class CustomSearchBar extends StatelessWidget {
   final TextEditingController controller;
-  const CustomSearchBar({super.key, required this.controller});
+  final Function(String) onChanged;
+  final VoidCallback onLeadingPressed;
+
+  const CustomSearchBar({
+    super.key,
+    required this.controller,
+    required this.onChanged,
+    required this.onLeadingPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +26,17 @@ class CustomSearchBar extends StatelessWidget {
       ),
       child: TextField(
         controller: controller,
+        onChanged: onChanged,
         decoration: InputDecoration(
-          prefixIcon: HeroIcon(HeroIcons.bars3BottomLeft),
-          suffixIcon: HeroIcon(HeroIcons.magnifyingGlass),
+          prefixIcon: IconButton(
+            onPressed: onLeadingPressed,
+            icon: const HeroIcon(HeroIcons.bars3BottomLeft),
+          ),
+          suffixIcon: const HeroIcon(HeroIcons.magnifyingGlass).paddingAll(12),
           hintText: 'Search for trip',
           border: OutlineInputBorder(borderSide: BorderSide.none),
         ),
-      ).paddingAll(4),
-    );
+      ),
+    ).paddingAll(4);
   }
 }

@@ -33,7 +33,9 @@ class OnboardingScreen extends StatelessWidget {
             Text('Explore The World Effortlessly', style: AppTextStyles.h2),
             SizedBox(height: AppSpacing.xl),
             GestureDetector(
-              onTap: () => context.goNamed('login'),
+              onTap: () {
+                context.goNamed('login');
+              },
               child: HeroIcon(HeroIcons.arrowRightCircle, size: 70),
             ),
           ],

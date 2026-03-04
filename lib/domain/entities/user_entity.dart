@@ -1,35 +1,31 @@
-import 'package:hive/hive.dart';
-
-part 'user_entity.g.dart';
-
-@HiveType(typeId: 2)
 class UserEntity {
-  @HiveField(0)
   final String email;
-  @HiveField(1)
-  final String password;
-  @HiveField(2)
+  final String uid;
   final String fullName;
-  @HiveField(3)
   final String gender;
-  @HiveField(4)
   final String phone;
 
   UserEntity({
     required this.email,
-    required this.password,
+    required this.uid,
     required this.fullName,
     required this.gender,
     required this.phone,
   });
-}
 
-List<UserEntity> userList = [
-  UserEntity(
-    email: 'user@gmail.com',
-    password: 'password',
-    fullName: 'User Full Name',
-    gender: 'Male',
-    phone: '6281234567890',
-  ),
-];
+  UserEntity copyWith({
+    String? uid,
+    String? email,
+    String? fullName,
+    String? gender,
+    String? phone,
+  }) {
+    return UserEntity(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      fullName: fullName ?? this.fullName,
+      gender: gender ?? this.gender,
+      phone: phone ?? this.phone,
+    );
+  }
+}

@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:mission_5_wanderly/presentation/screens/booking_detail_screen.dart';
 import 'package:mission_5_wanderly/presentation/screens/itinerary_screen.dart';
 import 'package:mission_5_wanderly/presentation/screens/home_screen.dart';
 import 'package:mission_5_wanderly/presentation/screens/login_screen.dart';
@@ -24,7 +25,7 @@ class AppRouter {
         name: 'home',
         builder: (_, __) => const HomeScreen(),
       ),
-      // 💎 Passing parameter via `GoRouter` di sini sangat elegant. 
+      // 💎 Passing parameter via `GoRouter` di sini sangat elegant.
       // Memudahkan deep linking di masa depan! 🛤️🔗
       GoRoute(
         path: '/trip_detail/:id',
@@ -35,12 +36,25 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: '/itinerary/:is_view/:id',
+        path: '/itinerary/:is_view/:id/:booking_id',
         name: 'itinerary',
         builder: (context, state) {
           final bool isView = state.pathParameters['is_view']! == 'true';
           final int tripId = int.parse(state.pathParameters['id']!);
-          return ItineraryScreen(isView: isView, tripId: tripId);
+          final String bookingId = state.pathParameters['booking_id']!;
+          return ItineraryScreen(
+            isView: isView,
+            tripId: tripId,
+            bookingId: bookingId,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/booking_detail/:id',
+        name: 'booking_detail',
+        builder: (context, state) {
+          final String id = state.pathParameters['id']!;
+          return BookingDetailScreen(bookingId: id);
         },
       ),
     ],

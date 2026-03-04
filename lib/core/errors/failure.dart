@@ -1,0 +1,13 @@
+abstract class Failure {
+  final String message;
+
+  Failure(this.message);
+}
+
+class AuthFailure extends Failure {
+  AuthFailure(super.message);
+}
+
+class UserFailure extends Failure {
+  UserFailure(super.message);
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
@@ -79,28 +80,70 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(userNotifierProvider, (previous, next) {
+      if (next.isLoading && !(previous?.isLoading ?? false)) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => PopScope(
+            canPop: false,
+            child: Center(
+              child: Lottie.asset(
+                'assets/icons/loading_icon.json',
+                width: 150,
+                height: 150,
+              ),
+            ),
+          ),
+        );
+      }
+
+      if (!next.isLoading && (previous?.isLoading ?? false)) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      }
+
+      if (next.message.isNotEmpty && next.message != previous?.message) {
+        final isSuccess = next.message.contains('Success');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            message: next.message,
+            icon: isSuccess ? HeroIcons.checkCircle : HeroIcons.xCircle,
+            isError: !isSuccess,
+          ),
+        );
+
+        if (isSuccess) {
+          clearAllControllers();
+          context.goNamed('home');
+        }
+      }
+    });
     return Scaffold(
-      body: Center(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            return orientation == Orientation.landscape
-                ? Row(
-                    children: mainContent(
-                      context,
-                    ).map((e) => Expanded(child: e)).toList(),
-                  )
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: mainContent(context),
-                  );
-          },
+      body: SingleChildScrollView(
+        child: Center(
+          child: OrientationBuilder(
+            builder: (context, orientation) {
+              return orientation == Orientation.landscape
+                  ? Row(
+                      children: mainContent(
+                        context,
+                      ).map((e) => Expanded(child: e)).toList(),
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: mainContent(context),
+                    );
+            },
+          ),
         ),
       ),
     );
   }
 
   Widget _loginField(Size screen, ThemeData theme) {
-    final provider = ref.read(userNotifierProvider.notifier);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -136,25 +179,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           onTap: () async {
             if (!loginFormKey.currentState!.validate()) return;
 
-            final message = await provider.login(
-              emailController.text,
-              passwordController.text,
-            );
-
-            final isSuccess = message == 'Success';
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackbar.show(
-                message: message,
-                icon: isSuccess ? HeroIcons.checkCircle : HeroIcons.xCircle,
-                isError: !isSuccess,
-              ),
-            );
-
-            if (isSuccess) {
-              clearAllControllers();
-              context.goNamed('home');
-            }
+            await ref
+                .read(userNotifierProvider.notifier)
+                .userLogin(
+                  emailController.text.trim(),
+                  passwordController.text.trim(),
+                );
           },
         ),
         SizedBox(height: AppSpacing.s),
@@ -306,28 +336,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
             final newUser = UserEntity(
               email: emailController.text,
-              password: passwordController.text,
               fullName: fullNameController.text,
               gender: genderDropDownValue,
               phone: phoneDropDownValue + phoneController.text,
+              uid: '',
             );
 
-            final message = await provider.signup(newUser);
-
-            final isSuccess = message == 'Signup Success';
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackbar.show(
-                message: message,
-                icon: isSuccess ? HeroIcons.checkCircle : HeroIcons.xCircle,
-                isError: !isSuccess,
-              ),
-            );
-
-            if (isSuccess) {
-              clearAllControllers();
-              setState(() => isLogin = true);
-            }
+            await provider.userRegister(newUser, passwordController.text);
           },
         ),
         SizedBox(height: AppSpacing.s),

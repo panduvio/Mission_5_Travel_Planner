@@ -39,6 +39,27 @@ class AppThemes {
         onSecondary: AppColors.white,
       ),
     ),
+    datePickerTheme: DatePickerThemeData(
+      rangeSelectionBackgroundColor: AppColors.perrywinkle.withAlpha(50),
+      rangeSelectionOverlayColor: WidgetStateProperty.all(
+        AppColors.perrywinkle.withAlpha(50),
+      ),
+      dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return AppColors.perrywinkle;
+        }
+        return null;
+      }),
+      dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return AppColors.lunarRock;
+        }
+        if (states.contains(WidgetState.selected)) {
+          return AppColors.white;
+        }
+        return AppColors.yankeesBlue;
+      }),
+    ),
 
     scaffoldBackgroundColor: AppColors.white,
   );
@@ -78,6 +99,27 @@ class AppThemes {
         secondary: AppColors.white,
         onSecondary: AppColors.yankeesBlue,
       ),
+    ),
+    datePickerTheme: DatePickerThemeData(
+      rangeSelectionBackgroundColor: AppColors.yankeesBlue.withAlpha(50),
+      rangeSelectionOverlayColor: WidgetStateProperty.all(
+        AppColors.yankeesBlue.withAlpha(50),
+      ),
+      dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return AppColors.white;
+        }
+        return null;
+      }),
+      dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return AppColors.midnightEscapade;
+        }
+        if (states.contains(WidgetState.selected)) {
+          return AppColors.yankeesBlue;
+        }
+        return AppColors.white;
+      }),
     ),
 
     scaffoldBackgroundColor: AppColors.midnightEscapade,

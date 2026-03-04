@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
+import 'package:mission_5_wanderly/core/extensions/theme_extension.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 
-// 💎 `TripCard` yang menggunakan `HeroIcons` memberikan sentuhan 
-// visual yang sangat modern dan premium. Penggunaan `AppSpacing` 
+// 💎 `TripCard` yang menggunakan `HeroIcons` memberikan sentuhan
+// visual yang sangat modern dan premium. Penggunaan `AppSpacing`
 // dan `AppRadius` juga sangat konsisten! 🎨✨
 class TripCard extends StatelessWidget {
   final String tripName;
@@ -22,7 +23,6 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final screen = MediaQuery.of(context).size;
     return Container(
       padding: EdgeInsets.all(AppSpacing.s),
@@ -30,12 +30,13 @@ class TripCard extends StatelessWidget {
       width: double.maxFinite,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppRadius.card),
-        color: theme.colorScheme.primary,
+        color: context.colors.primary,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
+            width: 120,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppRadius.card),
             ),
