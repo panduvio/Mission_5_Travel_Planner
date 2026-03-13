@@ -3,6 +3,8 @@ class HotelEntity {
   final String image;
   final String hotelName;
   final double rating;
+  final double lat;
+  final double long;
   final int price;
 
   HotelEntity({
@@ -10,6 +12,8 @@ class HotelEntity {
     required this.image,
     required this.hotelName,
     required this.rating,
+    required this.lat,
+    required this.long,
     required this.price,
   });
 }
@@ -21,6 +25,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'The Phoenix Hotel Yogyakarta',
     rating: 4.8,
     price: 1450000,
+    lat: -7.7833,
+    long: 110.3649,
   ),
   HotelEntity(
     city: 'Yogyakarta',
@@ -28,6 +34,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Adhisthana Hotel Yogyakarta',
     rating: 4.3,
     price: 520000,
+    lat: -7.8225,
+    long: 110.3695,
   ),
   HotelEntity(
     city: 'Beijing',
@@ -35,6 +43,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Rosewood Beijing',
     rating: 4.7,
     price: 4800000,
+    lat: 39.9156,
+    long: 116.4619,
   ),
   HotelEntity(
     city: 'Beijing',
@@ -42,6 +52,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Waldorf Astoria Beijing',
     rating: 4.8,
     price: 5600000,
+    lat: 39.9143,
+    long: 116.4095,
   ),
   HotelEntity(
     city: 'Tromsø',
@@ -49,6 +61,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Clarion Hotel The Edge',
     rating: 4.3,
     price: 2600000,
+    lat: 69.6487,
+    long: 18.9607,
   ),
   HotelEntity(
     city: 'Tromsø',
@@ -56,6 +70,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Radisson Blu Hotel Tromsø',
     rating: 4.4,
     price: 2350000,
+    lat: 69.6496,
+    long: 18.9560,
   ),
   HotelEntity(
     city: 'Tromsø',
@@ -63,6 +79,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Scandic Ishavshotel',
     rating: 4.8,
     price: 2800000,
+    lat: 69.6499,
+    long: 18.9585,
   ),
   HotelEntity(
     city: 'Tromsø',
@@ -70,6 +88,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Smarthotel Tromsø',
     rating: 4.1,
     price: 1450000,
+    lat: 69.6513,
+    long: 18.9534,
   ),
   HotelEntity(
     city: 'Kyoto',
@@ -77,6 +97,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Hotel Granvia Kyoto',
     rating: 4.5,
     price: 2900000,
+    lat: 34.9855,
+    long: 135.7585,
   ),
   HotelEntity(
     city: 'Kyoto',
@@ -84,6 +106,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'The Royal Park Hotel Sanjo',
     rating: 4.3,
     price: 1850000,
+    lat: 35.0093,
+    long: 135.7705,
   ),
   HotelEntity(
     city: 'Santorini',
@@ -91,6 +115,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'The Royal Park Hotel Sanjo',
     rating: 4.7,
     price: 4500000,
+    lat: 36.4618,
+    long: 25.3753,
   ),
   HotelEntity(
     city: 'Santorini',
@@ -98,6 +124,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Aressana Spa Hotel & Suites',
     rating: 4.6,
     price: 3100000,
+    lat: 36.4166,
+    long: 25.4314,
   ),
   HotelEntity(
     city: 'Serengiti',
@@ -105,6 +133,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Four Seasons Safari Lodge Serengeti',
     rating: 4.8,
     price: 12500000,
+    lat: -2.3338,
+    long: 34.8328,
   ),
   HotelEntity(
     city: 'Serengiti',
@@ -112,6 +142,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Meliá Serengeti Lodge',
     rating: 4.6,
     price: 9200000,
+    lat: 2.3330,
+    long: 34.8335,
   ),
   HotelEntity(
     city: 'El Calafate',
@@ -119,6 +151,8 @@ List<HotelEntity> hotelList = [
     hotelName: 'Xelena Hotel & Suites',
     rating: 4.4,
     price: 3900000,
+    lat: -50.3293,
+    long: -72.3006,
   ),
   HotelEntity(
     city: 'El Calafate',
@@ -126,5 +160,7 @@ List<HotelEntity> hotelList = [
     hotelName: 'Esplendor by Wyndham El Calafate',
     rating: 4.3,
     price: 2700000,
+    lat: -50.3408,
+    long: -72.2637,
   ),
 ];

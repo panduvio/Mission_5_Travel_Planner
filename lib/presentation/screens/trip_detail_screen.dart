@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
@@ -10,7 +13,7 @@ import 'package:mission_5_wanderly/core/themes/app_colors.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 import 'package:mission_5_wanderly/domain/entities/hotel_entity.dart';
 import 'package:mission_5_wanderly/domain/entities/trip_entity.dart';
-import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/page_provider.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
 import 'package:mission_5_wanderly/presentation/widgets/custom_snackbar.dart';
 
@@ -299,6 +302,60 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 },
               ),
             ],
+          ),
+          SizedBox(height: AppSpacing.m),
+          Container(
+            height: 200,
+            width: double.maxFinite,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppRadius.card),
+            ),
+            child: GoogleMap(
+              gestureRecognizers: {
+                Factory<OneSequenceGestureRecognizer>(
+                  () => EagerGestureRecognizer(),
+                ),
+              },
+              initialCameraPosition: CameraPosition(
+                target: LatLng(trip.lat, trip.long),
+                zoom: 12,
+              ),
+              markers: {
+                Marker(
+                  markerId: const MarkerId('trip_location'),
+                  position: LatLng(trip.lat, trip.long),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueRed,
+                  ),
+                ),
+
+                ...hotels.map(
+                  (hotel) => Marker(
+                    markerId: MarkerId(hotel.hotelName),
+                    position: LatLng(hotel.lat, hotel.long),
+                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueAzure,
+                    ),
+                  ),
+                ),
+              },
+              polylines: {
+                if (hotelChosen != -1)
+                  Polyline(
+                    patterns: [PatternItem.dot, PatternItem.gap(10)],
+                    polylineId: const PolylineId('route'),
+                    points: [
+                      LatLng(hotels[hotelChosen].lat, hotels[hotelChosen].long),
+                      LatLng(trip.lat, trip.long),
+                    ],
+                    width: 4,
+                    color: AppColors.tooBlueToBeTrue,
+                  ),
+              },
+              zoomGesturesEnabled: true,
+              scrollGesturesEnabled: true,
+            ),
           ),
           SizedBox(height: AppSpacing.m),
           Container(

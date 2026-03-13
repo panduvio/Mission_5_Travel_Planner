@@ -1,22 +1,17 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:lottie/lottie.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
 import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
+import 'package:mission_5_wanderly/core/helpers/trip_filter_helper.dart';
 import 'package:mission_5_wanderly/core/themes/app_colors.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
-import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/page_provider.dart';
 import 'package:mission_5_wanderly/presentation/providers/user_notifier.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
-import 'package:mission_5_wanderly/presentation/widgets/custom_popup.dart';
-import 'package:mission_5_wanderly/presentation/widgets/custom_search_bar.dart';
 import 'package:mission_5_wanderly/presentation/widgets/trip_card.dart';
 
 class HomePage extends ConsumerWidget {
@@ -28,6 +23,14 @@ class HomePage extends ConsumerWidget {
     final screen = MediaQuery.of(context).size;
     final trips = ref.read(tripListProvider);
     final _userState = ref.watch(userNotifierProvider);
+    final topRateTrips = TripFilterHelper.sortByRating(
+      trips: trips,
+      isAscending: false,
+    );
+    final popularTrips = TripFilterHelper.sortByVisitors(
+      trips: trips,
+      isAscending: false,
+    );
     return SingleChildScrollView(
       child: SafeArea(
         child: Center(
@@ -194,22 +197,35 @@ class HomePage extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            height: 100,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.card,
+                          GestureDetector(
+                            onTap: () {
+                              final tripId = trips.indexOf(topRateTrips[0]);
+                              context.goNamed(
+                                'trip_detail',
+                                pathParameters: {'id': tripId.toString()},
+                              );
+                            },
+                            child: Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: AppSpacing.xs,
                               ),
-                            ),
-                            clipBehavior: Clip.hardEdge,
-                            child: Image.asset(
-                              'assets/south_korea.jpg',
-                              fit: BoxFit.contain,
+                              height: 100,
+                              width: double.maxFinite,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.card,
+                                ),
+                              ),
+                              clipBehavior: Clip.hardEdge,
+                              child: Image.asset(
+                                topRateTrips[0].image,
+                                fit: BoxFit.fitWidth,
+                              ),
                             ),
                           ),
                           SizedBox(height: AppSpacing.xs),
                           Text(
-                            'Busan, South Korea',
+                            '${topRateTrips[0].city}, ${topRateTrips[0].country}',
                             style: AppTextStyles.labelLarge,
                           ),
                         ],
@@ -227,22 +243,35 @@ class HomePage extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            height: 100,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.card,
+                          GestureDetector(
+                            onTap: () {
+                              final tripId = trips.indexOf(topRateTrips[1]);
+                              context.goNamed(
+                                'trip_detail',
+                                pathParameters: {'id': tripId.toString()},
+                              );
+                            },
+                            child: Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: AppSpacing.xs,
                               ),
-                            ),
-                            clipBehavior: Clip.hardEdge,
-                            child: Image.asset(
-                              'assets/south_korea.jpg',
-                              fit: BoxFit.contain,
+                              height: 100,
+                              width: double.maxFinite,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.card,
+                                ),
+                              ),
+                              clipBehavior: Clip.hardEdge,
+                              child: Image.asset(
+                                topRateTrips[1].image,
+                                fit: BoxFit.fitWidth,
+                              ),
                             ),
                           ),
                           SizedBox(height: AppSpacing.xs),
                           Text(
-                            'Busan, South Korea',
+                            '${topRateTrips[1].city}, ${topRateTrips[1].country}',
                             style: AppTextStyles.labelLarge,
                           ),
                         ],
@@ -270,23 +299,40 @@ class HomePage extends ConsumerWidget {
                         AppButton(
                           content: 'Show All',
                           isOutline: true,
-                          onTap: () {},
+                          onTap: () {
+                            ref.read(tripSortTypeProvider.notifier).state =
+                                TripSortType.visitors;
+                            ref.read(tripSortAscendingProvider.notifier).state =
+                                false;
+                            ref.read(bottomNavIndexProvider.notifier).state = 1;
+                          },
                         ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(5, (_) {
+                      children: List.generate(5, (index) {
                         return Column(
                           children: [
-                            CircleAvatar(
-                              radius: 29,
-                              backgroundImage: AssetImage(
-                                'assets/explore_card.jpg',
+                            GestureDetector(
+                              onTap: () {
+                                final tripId = trips.indexOf(
+                                  popularTrips[index],
+                                );
+                                context.goNamed(
+                                  'trip_detail',
+                                  pathParameters: {'id': tripId.toString()},
+                                );
+                              },
+                              child: CircleAvatar(
+                                radius: 29,
+                                backgroundImage: AssetImage(
+                                  popularTrips[index].image,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Text('Kyoto'),
+                            Text(popularTrips[index].country),
                           ],
                         );
                       }),

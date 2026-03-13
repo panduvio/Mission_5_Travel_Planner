@@ -14,4 +14,5 @@ class AppColors {
   static const tooBlueToBeTrue = Color(0xff0088FF); // Progress Color
   static const transparent = Color.fromARGB(0, 0, 0, 0); // Error Color
   static const chosGardenMarigold = Color(0xffFF6200);
+  static const genoaLemon = Color(0xffffeb0a);
 }

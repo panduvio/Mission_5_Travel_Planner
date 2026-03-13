@@ -4,6 +4,8 @@ import 'package:mission_5_wanderly/core/errors/failure.dart';
 abstract class AuthFirebase {
   Future<UserCredential> userLogin(String email, String password);
   Future<UserCredential> userRegister(String email, String password);
+  Future<void> userLogout();
+  Future<void> deleteAccount(String password);
 }
 
 class AuthFirebaseImpl implements AuthFirebase {
@@ -37,6 +39,11 @@ class AuthFirebaseImpl implements AuthFirebase {
     }
   }
 
+  @override
+  Future<void> userLogout() async {
+    await _firebaseAuth.signOut();
+  }
+
   Failure _mapFirebaseAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
@@ -51,6 +58,28 @@ class AuthFirebaseImpl implements AuthFirebase {
         return AuthFailure('Check your internet connection.');
       default:
         return AuthFailure(e.message ?? 'Authentication failed.');
+    }
+  }
+
+  @override
+  Future<void> deleteAccount(String password) async {
+    final user = _firebaseAuth.currentUser;
+
+    if (user == null) {
+      throw AuthFailure("No authenticated user");
+    }
+
+    try {
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebaseAuthException(e);
     }
   }
 }

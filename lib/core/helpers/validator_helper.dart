@@ -1,5 +1,5 @@
 class ValidatorHelper {
-  ValidatorHelper._(); // prevent instantiation
+  ValidatorHelper._();
 
   static String? fullName(String? value) {
     if (value == null || value.trim().isEmpty) {
@@ -35,22 +35,16 @@ class ValidatorHelper {
     return null;
   }
 
-  static String? Function(String?) confirmPassword(String password) {
-    return (String? value) {
-      if (value == null || value.isEmpty) {
-        return 'Password is required';
-      }
+  static String? confirmPassword(String password, String? confirm) {
+    if (confirm == null || confirm.isEmpty) {
+      return 'Please confirm password';
+    }
 
-      if (value.length < 8) {
-        return 'Password must be at least 8 characters';
-      }
+    if (confirm != password) {
+      return 'Password does not match';
+    }
 
-      if (value != password) {
-        return 'Password doesn\'t match';
-      }
-
-      return null;
-    };
+    return null;
   }
 
   static String? phone(String? value) {

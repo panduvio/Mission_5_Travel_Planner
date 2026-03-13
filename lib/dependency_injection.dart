@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hive/hive.dart';
 import 'package:mission_5_wanderly/data/repositories/auth_repository_impl.dart';
 import 'package:mission_5_wanderly/data/repositories/booking_repository_impl.dart';
 import 'package:mission_5_wanderly/data/repositories/user_repository_impl.dart';
@@ -13,10 +12,12 @@ import 'package:mission_5_wanderly/domain/repositories/booking_repository.dart';
 import 'package:mission_5_wanderly/domain/repositories/user_repository.dart';
 import 'package:mission_5_wanderly/domain/usecases/book_trip_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/cancel_trip_usecase.dart';
+import 'package:mission_5_wanderly/domain/usecases/delete_account_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/get_user_bookings_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/get_user_by_id_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/update_trip_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/user_login_usecase.dart';
+import 'package:mission_5_wanderly/domain/usecases/user_logout_usecases.dart';
 import 'package:mission_5_wanderly/domain/usecases/user_register_usecase.dart';
 
 // 💎 Penggunaan `sl` (Service Locator) via `GetIt` adalah standar industri
@@ -43,6 +44,10 @@ void setup() {
   // di dalam aplikasi. Mantap! 🛡️🎯
   sl.registerLazySingleton<UserLoginUsecase>(
     () => UserLoginUsecase(sl(), sl()),
+  );
+  sl.registerLazySingleton<UserLogoutUsecases>(() => UserLogoutUsecases(sl()));
+  sl.registerLazySingleton<DeleteAccountUsecase>(
+    () => DeleteAccountUsecase(sl(), sl()),
   );
   sl.registerLazySingleton<UserRegisterUsecase>(
     () => UserRegisterUsecase(sl(), sl()),

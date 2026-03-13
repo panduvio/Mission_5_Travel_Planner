@@ -8,7 +8,7 @@ import 'package:mission_5_wanderly/core/extensions/theme_extension.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 import 'package:mission_5_wanderly/domain/entities/booking_entity.dart';
 import 'package:mission_5_wanderly/presentation/providers/booking_notifier.dart';
-import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/page_provider.dart';
 import 'package:mission_5_wanderly/presentation/providers/user_notifier.dart';
 import 'package:mission_5_wanderly/presentation/widgets/trip_card.dart';
 
@@ -31,6 +31,8 @@ class _MyTripPageState extends ConsumerState<MyTripPage> {
     Future.microtask(() {
       final uid = ref.read(userNotifierProvider).loginUser!.uid;
       ref.read(bookingNotifierProvider.notifier).getUserBookings(uid);
+      ref.read(bookingStatusFilterProvider.notifier).state =
+          BookingStatus.upcoming;
     });
   }
 
@@ -122,7 +124,7 @@ class _MyTripPageState extends ConsumerState<MyTripPage> {
                           setState(() {
                             selectedIndex = index;
                           });
-                          switch (index) {
+                          switch (selectedIndex) {
                             case 0:
                               ref
                                   .read(bookingStatusFilterProvider.notifier)

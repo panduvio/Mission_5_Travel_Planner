@@ -43,4 +43,14 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure('Unexpected error occurred.'));
     }
   }
+
+  @override
+  Future<void> userLogout() async {
+    await _authService.userLogout();
+  }
+
+  @override
+  Future<void> deleteAccount(String password) async {
+    await _authService.deleteAccount(password);
+  }
 }

@@ -1,4 +1,3 @@
-import 'package:mission_5_wanderly/domain/entities/booking_entity.dart';
 import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
 import 'package:mission_5_wanderly/domain/repositories/booking_repository.dart';
 

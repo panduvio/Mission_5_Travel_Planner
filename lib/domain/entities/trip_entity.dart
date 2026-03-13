@@ -6,8 +6,10 @@ class TripEntity {
   final String city;
   final int visitor;
   final int price;
-  final bool isBooked;
   final double rating;
+  final double lat;
+  final double long;
+  final bool isBooked;
 
   TripEntity({
     required this.tripName,
@@ -16,8 +18,10 @@ class TripEntity {
     required this.country,
     required this.city,
     required this.visitor,
-    required this.rating,
     required this.price,
+    required this.rating,
+    required this.lat,
+    required this.long,
     this.isBooked = false,
   });
 }
@@ -33,6 +37,8 @@ List<TripEntity> tripList = [
     visitor: 23013,
     rating: 9.3,
     price: 370000,
+    lat: -7.80139,
+    long: 110.36472,
   ),
   TripEntity(
     tripName: 'Heaven of Crane and Serenity',
@@ -45,6 +51,8 @@ List<TripEntity> tripList = [
     visitor: 79901,
     rating: 4.8,
     price: 5989000,
+    lat: 39.9042,
+    long: 116.4074,
   ),
   TripEntity(
     tripName: 'Aurora Dreams in the Arctic Sky',
@@ -56,6 +64,8 @@ List<TripEntity> tripList = [
     visitor: 454210,
     rating: 9.2,
     price: 18750000,
+    lat: 69.6492,
+    long: 18.9553,
   ),
   TripEntity(
     tripName: 'Sakura Harmony Escape',
@@ -67,6 +77,8 @@ List<TripEntity> tripList = [
     visitor: 120340,
     rating: 9.5,
     price: 14200000,
+    lat: 35.0116,
+    long: 135.7681,
   ),
   TripEntity(
     tripName: 'Mediterranean Soul of Santorini',
@@ -78,6 +90,8 @@ List<TripEntity> tripList = [
     visitor: 98560,
     rating: 9.3,
     price: 16890000,
+    lat: 36.3932,
+    long: 25.4615,
   ),
   TripEntity(
     tripName: 'Safari Majesty of the Serengeti',
@@ -89,6 +103,8 @@ List<TripEntity> tripList = [
     visitor: 67340,
     rating: 9.7,
     price: 32500000,
+    lat: -2.3333,
+    long: 34.8333,
   ),
   TripEntity(
     tripName: 'Patagonian Peaks and Glaciers Expedition',
@@ -100,5 +116,7 @@ List<TripEntity> tripList = [
     visitor: 38950,
     rating: 9.4,
     price: 21400000,
+    lat: -50.3379,
+    long: -72.2648,
   ),
 ];

@@ -13,7 +13,7 @@ import 'package:mission_5_wanderly/domain/entities/booking_entity.dart';
 import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
 import 'package:mission_5_wanderly/presentation/providers/booking_notifier.dart';
 import 'package:mission_5_wanderly/presentation/providers/itinerary_notifier.dart';
-import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/page_provider.dart';
 import 'package:mission_5_wanderly/presentation/providers/user_notifier.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
 import 'package:mission_5_wanderly/presentation/widgets/custom_snackbar.dart';
