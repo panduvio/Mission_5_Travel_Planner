@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 
-class OnboardingScreen extends StatelessWidget {
+class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
 
-  List<Widget> onboardingContent(BuildContext context) {
+  List<Widget> onboardingContent(BuildContext context, WidgetRef ref) {
     final screen = MediaQuery.of(context).size;
     final theme = Theme.of(context);
     return [
@@ -45,14 +46,14 @@ class OnboardingScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: Center(
         child: OrientationBuilder(
           builder: (context, orientation) {
             return orientation == Orientation.landscape
-                ? Row(children: onboardingContent(context))
-                : Column(children: onboardingContent(context));
+                ? Row(children: onboardingContent(context, ref))
+                : Column(children: onboardingContent(context, ref));
           },
         ),
       ),

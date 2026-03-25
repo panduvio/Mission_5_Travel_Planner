@@ -1,12 +1,13 @@
 import 'package:mission_5_wanderly/domain/entities/trip_entity.dart';
 import 'package:mission_5_wanderly/domain/repositories/trip_repository.dart';
 
-class UpdateTripUsecase {
+class GetTripsUsecase {
   final TripRepository repository;
 
-  UpdateTripUsecase(this.repository);
+  GetTripsUsecase(this.repository);
 
-  Future<void> updateTrip(TripEntity trip) async {
-    await repository.updateTrip(trip);
+  Stream<List<TripEntity>> getTrips() {
+    final trips = repository.getTrips();
+    return trips;
   }
 }

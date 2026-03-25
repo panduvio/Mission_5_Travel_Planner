@@ -5,7 +5,7 @@ import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
 import 'package:mission_5_wanderly/domain/usecases/book_trip_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/cancel_trip_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/get_user_bookings_usecase.dart';
-import 'package:mission_5_wanderly/domain/usecases/update_trip_usecase.dart';
+import 'package:mission_5_wanderly/domain/usecases/update_booking_usecase.dart';
 import 'package:mission_5_wanderly/presentation/providers/booking_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,7 +15,7 @@ part 'booking_notifier.g.dart';
 class BookingNotifier extends _$BookingNotifier {
   final _getUserBookings = GetIt.I<GetUserBookingsUsecase>();
   final _bookTrip = GetIt.I<BookTripUsecase>();
-  final _updateTrip = GetIt.I<UpdateTripUsecase>();
+  final _updateTrip = GetIt.I<UpdateBookingUsecase>();
   final _cancelTrip = GetIt.I<CancelTripUsecase>();
 
   @override
@@ -53,7 +53,7 @@ class BookingNotifier extends _$BookingNotifier {
     state = state.copyWith(isLoading: true);
 
     try {
-      await _updateTrip.updateTrip(bookingId, itineraries);
+      await _updateTrip.updateBooking(bookingId, itineraries);
       await getUserBookings(userId);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

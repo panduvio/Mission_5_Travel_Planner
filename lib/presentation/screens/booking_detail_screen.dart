@@ -8,7 +8,9 @@ import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
 import 'package:mission_5_wanderly/core/extensions/theme_extension.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 import 'package:mission_5_wanderly/domain/entities/booking_entity.dart';
+import 'package:mission_5_wanderly/domain/entities/trip_entity.dart';
 import 'package:mission_5_wanderly/presentation/providers/booking_notifier.dart';
+import 'package:mission_5_wanderly/presentation/providers/page_provider.dart';
 import 'package:mission_5_wanderly/presentation/providers/user_notifier.dart';
 import 'package:mission_5_wanderly/presentation/widgets/activity_timeline.dart';
 import 'package:mission_5_wanderly/presentation/widgets/back_button.dart';
@@ -30,48 +32,64 @@ class _BookingDetailScreen extends ConsumerState<BookingDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final booking = ref
-        .read(bookingNotifierProvider)
-        .bookings
-        .firstWhere((booking) => booking.bookingId == bookingId);
-    return Scaffold(
-      floatingActionButton: _buildExpandableFab(booking),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  CustomBackButton().withAlignment(Alignment.centerLeft),
+    // final booking = ref
+    //     .read(bookingNotifierProvider)
+    //     .bookings
+    //     .firstWhere((booking) => booking.bookingId == bookingId);
+    final tripsAsync = ref.watch(tripsProvider);
+    return tripsAsync.when(
+      loading: () => const CircularProgressIndicator(),
+      error: (e, _) => Text('Error: $e'),
+      data: (trips) {
+        final booking = ref
+            .read(bookingNotifierProvider)
+            .bookings
+            .firstWhere((b) => b.bookingId == bookingId);
 
-                  SizedBox(width: AppSpacing.xs),
-                  Text('Trip Detail', style: AppTextStyles.h2),
+        final trip = trips.firstWhere(
+          (t) => t.tripName == booking.tripName,
+          orElse: () => throw Exception('Trip not found'),
+        );
+        return Scaffold(
+          floatingActionButton: _buildExpandableFab(booking, trip),
+          body: SingleChildScrollView(
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      CustomBackButton().withAlignment(Alignment.centerLeft),
+
+                      SizedBox(width: AppSpacing.xs),
+                      Text('Trip Detail', style: AppTextStyles.h2),
+                    ],
+                  ),
+                  SizedBox(height: AppSpacing.m),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: booking.itineraries.length,
+                    itemBuilder: (context, index) {
+                      final isLast = index == booking.itineraries.length - 1;
+                      return ActivityTimeline(
+                        index: index,
+                        isLast: isLast,
+                        itinerary: booking.itineraries[index],
+                      );
+                    },
+                  ),
                 ],
-              ),
-              SizedBox(height: AppSpacing.m),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: booking.itineraries.length,
-                itemBuilder: (context, index) {
-                  final isLast = index == booking.itineraries.length - 1;
-                  return ActivityTimeline(
-                    index: index,
-                    isLast: isLast,
-                    itinerary: booking.itineraries[index],
-                  );
-                },
-              ),
-            ],
-          ).paddingAll(AppSpacing.xl),
-        ),
-      ),
+              ).paddingAll(AppSpacing.xl),
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildExpandableFab(BookingEntity booking) {
+  Widget _buildExpandableFab(BookingEntity booking, TripEntity trip) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -103,6 +121,7 @@ class _BookingDetailScreen extends ConsumerState<BookingDetailScreen> {
             ref
                 .read(bookingNotifierProvider.notifier)
                 .cancelTrip(bookingId, uid);
+            ref.read(tripNotifierProvider.notifier).updateTrip(trip, false);
             context.goNamed('home');
           },
           delay: 0.0,

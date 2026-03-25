@@ -44,7 +44,6 @@ class TripFilterHelper {
     return sorted;
   }
 
-  /// Sort by visitor count
   static List<TripEntity> sortByVisitors({
     required List<TripEntity> trips,
     required bool isAscending,
