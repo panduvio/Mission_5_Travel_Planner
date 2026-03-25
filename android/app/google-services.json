@@ -12,7 +12,12 @@
           "package_name": "com.example.mission_5_wanderly"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "17154489949-ln55718rplh7f3bkhetkqid97gvdbh0f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAw0O-hV5u3MnTD9fYiNSU-y34b1LDt5_Y"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "17154489949-ln55718rplh7f3bkhetkqid97gvdbh0f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "17154489949-bn2dpthev2t6kghij3sp7hhsmfm3sfji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mission5Wanderly"
+              }
+            }
+          ]
         }
       }
     }

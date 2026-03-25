@@ -6,6 +6,7 @@ import 'package:mission_5_wanderly/data/models/user_model.dart';
 abstract class UserFirestore {
   Future<UserModel> getUserById(String uid);
   Future<Unit> postUser(UserModel user);
+  Future<void> deleteUserData(String uid);
 }
 
 class UserFirestoreImpl implements UserFirestore {
@@ -40,5 +41,11 @@ class UserFirestoreImpl implements UserFirestore {
     } catch (e) {
       throw UserFailure('Failed to post user');
     }
+  }
+
+  @override
+  Future<void> deleteUserData(String uid) async {
+    await _db.collection('users').doc(uid).delete();
+    await _db.collection('bookings').doc(uid).delete();
   }
 }

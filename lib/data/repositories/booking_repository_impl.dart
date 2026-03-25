@@ -17,7 +17,7 @@ class BookingRepositoryImpl implements BookingRepository {
   }
 
   @override
-  Future<void> updateTrip(
+  Future<void> updateBooking(
     String bookingId,
     List<ItineraryEntity> itineraries,
   ) async {

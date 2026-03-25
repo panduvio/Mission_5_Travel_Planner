@@ -1,22 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hive/hive.dart';
 import 'package:mission_5_wanderly/data/repositories/auth_repository_impl.dart';
 import 'package:mission_5_wanderly/data/repositories/booking_repository_impl.dart';
+import 'package:mission_5_wanderly/data/repositories/trip_repository_impl.dart';
 import 'package:mission_5_wanderly/data/repositories/user_repository_impl.dart';
 import 'package:mission_5_wanderly/data/sources/auth_firebase.dart';
 import 'package:mission_5_wanderly/data/sources/booking_firestore.dart';
+import 'package:mission_5_wanderly/data/sources/trip_firestore.dart';
 import 'package:mission_5_wanderly/data/sources/user_firestore.dart';
 import 'package:mission_5_wanderly/domain/repositories/auth_repository.dart';
 import 'package:mission_5_wanderly/domain/repositories/booking_repository.dart';
+import 'package:mission_5_wanderly/domain/repositories/trip_repository.dart';
 import 'package:mission_5_wanderly/domain/repositories/user_repository.dart';
 import 'package:mission_5_wanderly/domain/usecases/book_trip_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/cancel_trip_usecase.dart';
+import 'package:mission_5_wanderly/domain/usecases/delete_account_usecase.dart';
+import 'package:mission_5_wanderly/domain/usecases/get_trips_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/get_user_bookings_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/get_user_by_id_usecase.dart';
+import 'package:mission_5_wanderly/domain/usecases/post_trips_usecase.dart';
+import 'package:mission_5_wanderly/domain/usecases/update_booking_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/update_trip_usecase.dart';
 import 'package:mission_5_wanderly/domain/usecases/user_login_usecase.dart';
+import 'package:mission_5_wanderly/domain/usecases/user_logout_usecases.dart';
 import 'package:mission_5_wanderly/domain/usecases/user_register_usecase.dart';
 
 // 💎 Penggunaan `sl` (Service Locator) via `GetIt` adalah standar industri
@@ -30,6 +37,7 @@ void setup() {
   sl.registerLazySingleton<AuthFirebase>(() => AuthFirebaseImpl(sl()));
   sl.registerLazySingleton<UserFirestore>(() => UserFirestoreImpl(sl()));
   sl.registerLazySingleton<BookingFirestore>(() => BookingFirestoreImpl(sl()));
+  sl.registerLazySingleton<TripFirestore>(() => TripFirestoreImpl(sl()));
 
   // Repositories
   sl.registerLazySingleton<BookingRepository>(
@@ -37,6 +45,7 @@ void setup() {
   );
   sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()));
   sl.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(sl()));
+  sl.registerLazySingleton<TripRepository>(() => TripRepositoryImpl(sl()));
 
   // Usecases
   // 💎 Pendaftaran Use Cases sebagai LazySingleton memastikan efisiensi memori
@@ -44,14 +53,23 @@ void setup() {
   sl.registerLazySingleton<UserLoginUsecase>(
     () => UserLoginUsecase(sl(), sl()),
   );
+  sl.registerLazySingleton<UserLogoutUsecases>(() => UserLogoutUsecases(sl()));
+  sl.registerLazySingleton<DeleteAccountUsecase>(
+    () => DeleteAccountUsecase(sl(), sl()),
+  );
   sl.registerLazySingleton<UserRegisterUsecase>(
     () => UserRegisterUsecase(sl(), sl()),
   );
   sl.registerLazySingleton<GetUserByIdUsecase>(() => GetUserByIdUsecase(sl()));
   sl.registerLazySingleton<BookTripUsecase>(() => BookTripUsecase(sl()));
-  sl.registerLazySingleton<UpdateTripUsecase>(() => UpdateTripUsecase(sl()));
+  sl.registerLazySingleton<UpdateBookingUsecase>(
+    () => UpdateBookingUsecase(sl()),
+  );
   sl.registerLazySingleton<CancelTripUsecase>(() => CancelTripUsecase(sl()));
   sl.registerLazySingleton<GetUserBookingsUsecase>(
     () => GetUserBookingsUsecase(sl()),
   );
+  sl.registerLazySingleton<PostTripsUsecase>(() => PostTripsUsecase(sl()));
+  sl.registerLazySingleton<UpdateTripUsecase>(() => UpdateTripUsecase(sl()));
+  sl.registerLazySingleton<GetTripsUsecase>(() => GetTripsUsecase(sl()));
 }

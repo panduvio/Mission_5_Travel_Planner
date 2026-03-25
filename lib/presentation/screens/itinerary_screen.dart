@@ -13,7 +13,7 @@ import 'package:mission_5_wanderly/domain/entities/booking_entity.dart';
 import 'package:mission_5_wanderly/domain/entities/itinerary_entity.dart';
 import 'package:mission_5_wanderly/presentation/providers/booking_notifier.dart';
 import 'package:mission_5_wanderly/presentation/providers/itinerary_notifier.dart';
-import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/page_provider.dart';
 import 'package:mission_5_wanderly/presentation/providers/user_notifier.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
 import 'package:mission_5_wanderly/presentation/widgets/custom_snackbar.dart';
@@ -21,7 +21,8 @@ import 'package:mission_5_wanderly/presentation/widgets/custom_text_field.dart';
 import 'package:mission_5_wanderly/presentation/widgets/grid_card.dart';
 
 class ItineraryScreen extends ConsumerStatefulWidget {
-  final int tripId;
+  // final int tripId;
+  final String tripId;
   final bool isView;
   final String bookingId;
   const ItineraryScreen({
@@ -38,7 +39,8 @@ class ItineraryScreen extends ConsumerStatefulWidget {
 
 class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   final bool isView;
-  final int tripId;
+  // final int tripId;
+  final String tripId;
   final String _bookingId;
   _ItineraryScreenState(this.isView, this.tripId, this._bookingId);
   TextEditingController activityController = TextEditingController();
@@ -106,11 +108,12 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final itineraries = ref.watch(itineraryNotifierProvider).itineraries;
-    final _bookingProvider = ref.read(bookingNotifierProvider.notifier);
-    final _itineraryProvider = ref.read(itineraryNotifierProvider.notifier);
-    final hotel = ref.watch(chosenHotelProvider);
-    final trip = ref.watch(tripListProvider)[tripId];
+    // final itineraries = ref.watch(itineraryNotifierProvider).itineraries;
+    // final _bookingProvider = ref.read(bookingNotifierProvider.notifier);
+    // final _itineraryProvider = ref.read(itineraryNotifierProvider.notifier);
+    // final hotel = ref.watch(chosenHotelProvider);
+    // final trip = ref.watch(tripListProvider)[tripId];
+    final tripsAsync = ref.watch(tripsProvider);
 
     if (isView) {
       final _updateBooking = ref
@@ -137,145 +140,178 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     ];
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: () => context.goNamed('home'),
-                child: HeroIcon(
-                  HeroIcons.arrowLeftCircle,
-                  color: AppColors.white,
-                  size: 40,
-                ).paddingAll(AppSpacing.m),
-              ).withAlignment(Alignment.centerLeft),
-              Text('Add to Itinerary!', style: AppTextStyles.h1),
-              SizedBox(height: AppSpacing.m),
-              isView
-                  ? SizedBox()
-                  : Text('Pick a Date', style: AppTextStyles.labelLarge),
-              SizedBox(height: AppSpacing.xs),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: tripsAsync.when(
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+
+        error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
+
+        data: (trips) {
+          final trip = trips.firstWhere((t) => t.tripId == widget.tripId);
+
+          final itineraries = ref.watch(itineraryNotifierProvider).itineraries;
+
+          final bookingProvider = ref.read(bookingNotifierProvider.notifier);
+
+          final itineraryProvider = ref.read(
+            itineraryNotifierProvider.notifier,
+          );
+
+          final hotel = ref.watch(chosenHotelProvider);
+          return SingleChildScrollView(
+            child: SafeArea(
+              child: Column(
                 children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      isView ? null : _selectBookingRange();
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          bookingDateRange != null
-                              ? '${bookingDateRange!.start.day}/${bookingDateRange!.start.month}/${bookingDateRange!.start.year}'
-                                    ' - '
-                                    '${bookingDateRange!.end.day}/${bookingDateRange!.end.month}/${bookingDateRange!.end.year}'
-                              : 'No date selected',
-                          style: AppTextStyles.labelLarge.copyWith(
-                            fontSize: 14,
-                            color: theme.colorScheme.tertiary,
-                          ),
+                  GestureDetector(
+                    onTap: () => context.goNamed('home'),
+                    child: HeroIcon(
+                      HeroIcons.arrowLeftCircle,
+                      color: AppColors.white,
+                      size: 40,
+                    ).paddingAll(AppSpacing.m),
+                  ).withAlignment(Alignment.centerLeft),
+                  Text('Add to Itinerary!', style: AppTextStyles.h1),
+                  SizedBox(height: AppSpacing.m),
+                  isView
+                      ? SizedBox()
+                      : Text('Pick a Date', style: AppTextStyles.labelLarge),
+                  SizedBox(height: AppSpacing.xs),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {
+                          isView ? null : _selectBookingRange();
+                        },
+                        child: Row(
+                          children: [
+                            Text(
+                              bookingDateRange != null
+                                  ? '${bookingDateRange!.start.day}/${bookingDateRange!.start.month}/${bookingDateRange!.start.year}'
+                                        ' - '
+                                        '${bookingDateRange!.end.day}/${bookingDateRange!.end.month}/${bookingDateRange!.end.year}'
+                                  : 'No date selected',
+                              style: AppTextStyles.labelLarge.copyWith(
+                                fontSize: 14,
+                                color: theme.colorScheme.tertiary,
+                              ),
+                            ),
+                            SizedBox(width: AppSpacing.xs),
+                            HeroIcon(
+                              HeroIcons.calendarDays,
+                              size: 24,
+                              color: theme.colorScheme.tertiary,
+                            ),
+                          ],
                         ),
-                        SizedBox(width: AppSpacing.xs),
-                        HeroIcon(
-                          HeroIcons.calendarDays,
-                          size: 24,
-                          color: theme.colorScheme.tertiary,
-                        ),
-                      ],
+                      ),
+                      Spacer(),
+                      AppButton(
+                        content: isView ? 'Save' : 'Book Now!',
+                        onTap: () {
+                          final uid = ref
+                              .read(userNotifierProvider)
+                              .loginUser!
+                              .uid;
+
+                          if (!isView) {
+                            final expenditure = trip.price + hotel!.price;
+
+                            final booking = BookingEntity(
+                              bookingId: _bookingId == 'new' ? '' : _bookingId,
+                              userId: uid,
+                              startDate: bookingDateRange!.start,
+                              endDate: bookingDateRange!.end,
+                              tripName: trip.tripName,
+                              hotelName: hotel.hotelName,
+                              expenditure: expenditure,
+                              itineraries: itineraries,
+                            );
+                            bookingProvider.bookTrip(booking);
+                            ref
+                                .read(tripNotifierProvider.notifier)
+                                .updateTrip(trip, true);
+                            context.goNamed('home');
+                          } else {
+                            bookingProvider.updateTrip(
+                              _bookingId,
+                              uid,
+                              itineraries,
+                            );
+                            context.goNamed(
+                              'booking_detail',
+                              pathParameters: {'id': _bookingId},
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: gridItems.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisSpacing: AppSpacing.m,
+                      crossAxisSpacing: AppSpacing.m,
+                      crossAxisCount: 3,
                     ),
-                  ),
-                  Spacer(),
-                  AppButton(
-                    content: isView ? 'Save' : 'Book Now!',
-                    onTap: () {
-                      final uid = ref.read(userNotifierProvider).loginUser!.uid;
-
-                      if (!isView) {
-                        final expenditure = trip.price + hotel!.price;
-
-                        final booking = BookingEntity(
-                          bookingId: _bookingId == 'new' ? '' : _bookingId,
-                          userId: uid,
-                          startDate: bookingDateRange!.start,
-                          endDate: bookingDateRange!.end,
-                          tripName: trip.tripName,
-                          hotelName: hotel.hotelName,
-                          expenditure: expenditure,
-                          itineraries: itineraries,
-                        );
-                        _bookingProvider.bookTrip(booking);
-                        context.goNamed('home');
-                      } else {
-                        _bookingProvider.updateTrip(
-                          _bookingId,
-                          uid,
-                          itineraries,
-                        );
-                        context.goNamed(
-                          'booking_detail',
-                          pathParameters: {'id': _bookingId},
-                        );
-                      }
-                    },
-                  ),
-                ],
-              ),
-              GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: gridItems.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisSpacing: AppSpacing.m,
-                  crossAxisSpacing: AppSpacing.m,
-                  crossAxisCount: 3,
-                ),
-                itemBuilder: (context, index) {
-                  return GridCard(
-                    icon: gridItems[index]['icon'],
-                    label: gridItems[index]['label'],
-                    onTap: () {
-                      final validationMessage = ValidatorHelper.bookingDate(
-                        bookingDateRange?.start,
-                        bookingDateRange?.end,
+                    itemBuilder: (context, index) {
+                      return GridCard(
+                        icon: gridItems[index]['icon'],
+                        label: gridItems[index]['label'],
+                        onTap: () {
+                          final validationMessage = ValidatorHelper.bookingDate(
+                            bookingDateRange?.start,
+                            bookingDateRange?.end,
+                          );
+                          if (validationMessage == null || isView) {
+                            final addedItinerary = ItineraryEntity(
+                              title: gridItems[index]['label'],
+                              date:
+                                  selectedActivityDate ??
+                                  bookingDateRange!.start,
+                            );
+                            itineraryProvider.postItinerary(addedItinerary);
+                            print('itinerary: ${itineraries.length}');
+                            // itineraryProvider.postItinerary(tripId, itineraries);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              CustomSnackbar.show(
+                                message: validationMessage,
+                                icon: HeroIcons.exclamationCircle,
+                                isError: true,
+                              ),
+                            );
+                            print('test');
+                          }
+                        },
                       );
-                      if (validationMessage == null || isView) {
-                        final addedItinerary = ItineraryEntity(
-                          title: gridItems[index]['label'],
-                          date: selectedActivityDate ?? bookingDateRange!.start,
-                        );
-                        _itineraryProvider.postItinerary(addedItinerary);
-                        print('itinerary: ${itineraries.length}');
-                        // itineraryProvider.postItinerary(tripId, itineraries);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          CustomSnackbar.show(
-                            message: validationMessage,
-                            icon: HeroIcons.exclamationCircle,
-                            isError: true,
-                          ),
-                        );
-                        print('test');
-                      }
                     },
-                  );
-                },
-              ).paddingAll(AppSpacing.s),
-              SizedBox(height: AppSpacing.m),
-              itineraries.isEmpty
-                  ? SizedBox()
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: itineraries.length,
-                      itemBuilder: (context, index) {
-                        return _activityTiles(theme, index, itineraries, () {
-                          _itineraryProvider.removeItinerary(index);
-                        });
-                      },
-                    ),
-            ],
-          ).paddingAll(AppSpacing.xl),
-        ),
+                  ).paddingAll(AppSpacing.s),
+                  SizedBox(height: AppSpacing.m),
+                  itineraries.isEmpty
+                      ? SizedBox()
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: itineraries.length,
+                          itemBuilder: (context, index) {
+                            return _activityTiles(
+                              theme,
+                              index,
+                              itineraries,
+                              () {
+                                itineraryProvider.removeItinerary(index);
+                              },
+                            );
+                          },
+                        ),
+                ],
+              ).paddingAll(AppSpacing.xl),
+            ),
+          );
+        },
       ),
     );
   }

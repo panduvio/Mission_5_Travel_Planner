@@ -20,18 +20,14 @@ class AppRouter {
         name: 'login',
         builder: (_, __) => const LoginScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        name: 'home',
-        builder: (_, __) => const HomeScreen(),
-      ),
+      GoRoute(path: '/home', name: 'home', builder: (_, __) => HomeScreen()),
       // 💎 Passing parameter via `GoRouter` di sini sangat elegant.
       // Memudahkan deep linking di masa depan! 🛤️🔗
       GoRoute(
         path: '/trip_detail/:id',
         name: 'trip_detail',
         builder: (context, state) {
-          final int id = int.parse(state.pathParameters['id']!);
+          final String id = state.pathParameters['id']!;
           return TripDetailScreen(tripId: id);
         },
       ),
@@ -40,7 +36,7 @@ class AppRouter {
         name: 'itinerary',
         builder: (context, state) {
           final bool isView = state.pathParameters['is_view']! == 'true';
-          final int tripId = int.parse(state.pathParameters['id']!);
+          final String tripId = state.pathParameters['id']!;
           final String bookingId = state.pathParameters['booking_id']!;
           return ItineraryScreen(
             isView: isView,

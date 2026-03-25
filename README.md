@@ -13,8 +13,34 @@ pada presentation layer, terdapat screen sebagai layar yang ditampilkan, widget 
 
 ## Fitur
 
-fitur yang diupdate pada mission 7 adalah migrasi hive ke firebase baik data maupun login, fitur my trip dan explore yang terpisah, logic booking yang sebelumnya belum ada atau hanya itinerary saja, dan penambahan activity timeline.
+fitur yang diupdate pada mission 8 adalah implementasi fitur maps pada aplikasi dan clean architecture. Selain itu, unit testing juga dibutuhkan untuk menguji beberapa fitur.
 
-### Fitur yang bisa dikembangkan
+## Firebase rules
 
-login menggunakan google akan ditambahkan di commit berikutnya. penyesuaian homescreen agar semua fitur bisa bekerja. menambahkan halaman profile. menambahkan session (kondisional). refactor UI (clean design dan color pallete).
+rules_version = '2';
+
+service cloud.firestore {
+match /databases/{database}/documents {
+
+    match /users/{userId} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+    }
+
+    match /bookings/{bookingId} {
+      allow create: if request.auth != null
+                    && request.auth.uid == request.resource.data.userId;
+
+      allow read, update, delete: if request.auth != null
+                                   && request.auth.uid == resource.data.userId;
+    }
+
+    match /trips/{tripId} {
+      allow create: if request.auth != null;
+
+    	  allow read, update: if request.auth != null;
+
+}
+
+}
+}

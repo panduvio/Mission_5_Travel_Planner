@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mission_5_wanderly/core/constants/app_radius.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/extensions/alignment_extension.dart';
@@ -10,12 +13,13 @@ import 'package:mission_5_wanderly/core/themes/app_colors.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 import 'package:mission_5_wanderly/domain/entities/hotel_entity.dart';
 import 'package:mission_5_wanderly/domain/entities/trip_entity.dart';
-import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/page_provider.dart';
 import 'package:mission_5_wanderly/presentation/widgets/app_button.dart';
 import 'package:mission_5_wanderly/presentation/widgets/custom_snackbar.dart';
 
 class TripDetailScreen extends ConsumerStatefulWidget {
-  final int tripId;
+  // final int tripId;
+  final String tripId;
   const TripDetailScreen({super.key, required this.tripId});
 
   @override
@@ -24,7 +28,8 @@ class TripDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
-  final int _tripId;
+  // final int _tripId;
+  final String _tripId;
 
   _TripDetailScreenState(this._tripId);
 
@@ -32,169 +37,192 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final trip = ref.read(tripListProvider)[_tripId];
-    final hotels = ref.watch(filteredHotelProvider(trip.city));
-    final theme = Theme.of(context);
-    final screen = MediaQuery.of(context).size;
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // 💎 Header dengan detail destinasi dan tombol back yang elegan.
-            // Penggunaan `HeroIcon` menambah kesan modern pada UI! 🚀🌟
-            SizedBox(
-              height: 200,
-              child: Stack(
-                children: [
-                  SizedBox(
-                    width: screen.width,
-                    child: Image.asset(trip.image, fit: BoxFit.fitWidth),
-                  ),
-                  Container(
-                    height: double.maxFinite,
-                    width: double.maxFinite,
-                    color: const Color.fromARGB(51, 0, 0, 0),
-                  ),
-                  SizedBox(
-                    width: screen.width * 0.7,
-                    child: Text(
-                      trip.tripName,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.h1.copyWith(
-                        color: AppColors.white,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ).withAlignment(Alignment.center),
-                  SafeArea(
-                    child: GestureDetector(
-                      onTap: () => context.goNamed('home'),
-                      child: HeroIcon(
-                        HeroIcons.arrowLeftCircle,
-                        color: AppColors.white,
-                        size: 40,
-                      ).paddingAll(AppSpacing.m),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            _detailContent(trip, hotels),
-            Container(
-              padding: EdgeInsets.all(AppSpacing.xl),
-              color: theme.colorScheme.tertiary,
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: screen.width * 0.4,
-                    child: Image.asset(
-                      'assets/wanderly_icon.png',
-                      fit: BoxFit.fitWidth,
-                    ),
-                  ).withAlignment(Alignment.centerLeft),
-                  SizedBox(height: AppSpacing.m),
-                  Text(
-                    'Enjoy your trip with glorious serve from harijumat.co!',
-                    style: AppTextStyles.h3.copyWith(
-                      color: theme.colorScheme.secondary,
-                    ),
-                  ),
-                  SizedBox(height: AppSpacing.s),
-                  Text(
-                    'Jl. Raya Pajajaran No.88, Kel. Tanah Sareal, Kec. Bogor Tengah, Kota Bogor, Jawa Barat, 16127, Indonesia',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: theme.colorScheme.secondary,
-                    ),
-                  ),
-                  SizedBox(height: AppSpacing.s),
-                  Text(
-                    '+62-891827-23293',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: theme.colorScheme.secondary,
-                    ),
-                  ).withAlignment(Alignment.centerLeft),
-                  SizedBox(height: AppSpacing.s),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // final trip = ref.read(tripListProvider)[_tripId];
+    final tripsAsync = ref.watch(tripsProvider);
+    // final hotels = ref.watch(filteredHotelProvider(trip.city));
+    // final theme = Theme.of(context);
+    // final screen = MediaQuery.of(context).size;
+    return tripsAsync.when(
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+
+      error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
+
+      data: (trips) {
+        final trip = trips.where((t) => t.tripId == _tripId).firstOrNull;
+
+        if (trip == null) {
+          print(
+            'Trip length on first id (${trips[0].tripId}): ' +
+                trips.length.toString(),
+          );
+          return const Scaffold(body: Center(child: Text('Trip not found')));
+        }
+
+        final hotels = ref.watch(filteredHotelProvider(trip.city));
+        final theme = Theme.of(context);
+        final screen = MediaQuery.of(context).size;
+        return Scaffold(
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                // 💎 Header dengan detail destinasi dan tombol back yang elegan.
+                // Penggunaan `HeroIcon` menambah kesan modern pada UI! 🚀🌟
+                SizedBox(
+                  height: 200,
+                  child: Stack(
                     children: [
-                      Text(
-                        'Perusahaan',
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: theme.colorScheme.secondary,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      SizedBox(
+                        width: screen.width,
+                        child: Image.asset(trip.image, fit: BoxFit.fitWidth),
                       ),
-                      HeroIcon(
-                        HeroIcons.arrowRight,
-                        color: theme.colorScheme.secondary,
+                      Container(
+                        height: double.maxFinite,
+                        width: double.maxFinite,
+                        color: const Color.fromARGB(51, 0, 0, 0),
+                      ),
+                      SizedBox(
+                        width: screen.width * 0.7,
+                        child: Text(
+                          trip.tripName,
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.h1.copyWith(
+                            color: AppColors.white,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ).withAlignment(Alignment.center),
+                      SafeArea(
+                        child: GestureDetector(
+                          onTap: () => context.goNamed('home'),
+                          child: HeroIcon(
+                            HeroIcons.arrowLeftCircle,
+                            color: AppColors.white,
+                            size: 40,
+                          ).paddingAll(AppSpacing.m),
+                        ),
                       ),
                     ],
                   ),
-                  SizedBox(height: AppSpacing.s),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                _detailContent(trip, hotels),
+                Container(
+                  padding: EdgeInsets.all(AppSpacing.xl),
+                  color: theme.colorScheme.tertiary,
+                  child: Column(
                     children: [
-                      Text(
-                        'Perusahaan',
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: theme.colorScheme.secondary,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      HeroIcon(
-                        HeroIcons.arrowRight,
-                        color: theme.colorScheme.secondary,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: AppSpacing.m),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Komunitas',
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: theme.colorScheme.secondary,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      HeroIcon(HeroIcons.arrowRight),
-                    ],
-                  ),
-                  Divider(color: theme.colorScheme.secondary),
-                  SizedBox(height: AppSpacing.s),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: List.generate(4, (index) {
-                      final socials = <String>[
-                        "assets/linkedin.png",
-                        "assets/instagram.png",
-                        "assets/twitter.png",
-                        "assets/facebook.png",
-                      ];
-                      return SizedBox(
-                        height: 50,
-                        width: 50,
+                      SizedBox(
+                        width: screen.width * 0.4,
                         child: Image.asset(
-                          socials[index],
-                          fit: BoxFit.fitHeight,
+                          'assets/wanderly_icon.png',
+                          fit: BoxFit.fitWidth,
                         ),
-                      ).paddingSymmetrical(AppSpacing.xs, 0);
-                    }),
+                      ).withAlignment(Alignment.centerLeft),
+                      SizedBox(height: AppSpacing.m),
+                      Text(
+                        'Enjoy your trip with glorious serve from harijumat.co!',
+                        style: AppTextStyles.h3.copyWith(
+                          color: theme.colorScheme.secondary,
+                        ),
+                      ),
+                      SizedBox(height: AppSpacing.s),
+                      Text(
+                        'Jl. Raya Pajajaran No.88, Kel. Tanah Sareal, Kec. Bogor Tengah, Kota Bogor, Jawa Barat, 16127, Indonesia',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: theme.colorScheme.secondary,
+                        ),
+                      ),
+                      SizedBox(height: AppSpacing.s),
+                      Text(
+                        '+62-891827-23293',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: theme.colorScheme.secondary,
+                        ),
+                      ).withAlignment(Alignment.centerLeft),
+                      SizedBox(height: AppSpacing.s),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Perusahaan',
+                            style: AppTextStyles.bodyLarge.copyWith(
+                              color: theme.colorScheme.secondary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          HeroIcon(
+                            HeroIcons.arrowRight,
+                            color: theme.colorScheme.secondary,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: AppSpacing.s),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Perusahaan',
+                            style: AppTextStyles.bodyLarge.copyWith(
+                              color: theme.colorScheme.secondary,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          HeroIcon(
+                            HeroIcons.arrowRight,
+                            color: theme.colorScheme.secondary,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: AppSpacing.m),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Komunitas',
+                            style: AppTextStyles.bodyLarge.copyWith(
+                              color: theme.colorScheme.secondary,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          HeroIcon(HeroIcons.arrowRight),
+                        ],
+                      ),
+                      Divider(color: theme.colorScheme.secondary),
+                      SizedBox(height: AppSpacing.s),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: List.generate(4, (index) {
+                          final socials = <String>[
+                            "assets/linkedin.png",
+                            "assets/instagram.png",
+                            "assets/twitter.png",
+                            "assets/facebook.png",
+                          ];
+                          return SizedBox(
+                            height: 50,
+                            width: 50,
+                            child: Image.asset(
+                              socials[index],
+                              fit: BoxFit.fitHeight,
+                            ),
+                          ).paddingSymmetrical(AppSpacing.xs, 0);
+                        }),
+                      ),
+                      SizedBox(height: AppSpacing.s),
+                      Text(
+                        '@2026 Kwetiau Siram All Rights \nReserved',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: theme.colorScheme.secondary,
+                        ),
+                      ).withAlignment(Alignment.centerLeft),
+                    ],
                   ),
-                  SizedBox(height: AppSpacing.s),
-                  Text(
-                    '@2026 Kwetiau Siram All Rights \nReserved',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: theme.colorScheme.secondary,
-                    ),
-                  ).withAlignment(Alignment.centerLeft),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -299,6 +327,60 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 },
               ),
             ],
+          ),
+          SizedBox(height: AppSpacing.m),
+          Container(
+            height: 200,
+            width: double.maxFinite,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppRadius.card),
+            ),
+            child: GoogleMap(
+              gestureRecognizers: {
+                Factory<OneSequenceGestureRecognizer>(
+                  () => EagerGestureRecognizer(),
+                ),
+              },
+              initialCameraPosition: CameraPosition(
+                target: LatLng(trip.lat, trip.long),
+                zoom: 12,
+              ),
+              markers: {
+                Marker(
+                  markerId: const MarkerId('trip_location'),
+                  position: LatLng(trip.lat, trip.long),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueRed,
+                  ),
+                ),
+
+                ...hotels.map(
+                  (hotel) => Marker(
+                    markerId: MarkerId(hotel.hotelName),
+                    position: LatLng(hotel.lat, hotel.long),
+                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueAzure,
+                    ),
+                  ),
+                ),
+              },
+              polylines: {
+                if (hotelChosen != -1)
+                  Polyline(
+                    patterns: [PatternItem.dot, PatternItem.gap(10)],
+                    polylineId: const PolylineId('route'),
+                    points: [
+                      LatLng(hotels[hotelChosen].lat, hotels[hotelChosen].long),
+                      LatLng(trip.lat, trip.long),
+                    ],
+                    width: 4,
+                    color: AppColors.tooBlueToBeTrue,
+                  ),
+              },
+              zoomGesturesEnabled: true,
+              scrollGesturesEnabled: true,
+            ),
           ),
           SizedBox(height: AppSpacing.m),
           Container(

@@ -4,9 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
 import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
-import 'package:mission_5_wanderly/core/extensions/positioned_extension.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
-import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/page_provider.dart';
 import 'package:mission_5_wanderly/presentation/widgets/custom_search_bar.dart';
 import 'package:mission_5_wanderly/presentation/widgets/trip_card.dart';
 
@@ -40,9 +39,32 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
       ),
       builder: (context) {
         return Consumer(
-          // Use Consumer to get ref inside builder
           builder: (context, ref, child) {
+            final sortType = ref.watch(tripSortTypeProvider);
             final isAsc = ref.watch(tripSortAscendingProvider);
+
+            Widget buildTile({
+              required HeroIcons icon,
+              required String title,
+              required TripSortType type,
+              required bool ascending,
+            }) {
+              final selected = sortType == type && isAsc == ascending;
+
+              return ListTile(
+                leading: HeroIcon(icon),
+                title: Text(title),
+                trailing: selected
+                    ? const HeroIcon(HeroIcons.check, color: Colors.blue)
+                    : null,
+                onTap: () {
+                  ref.read(tripSortTypeProvider.notifier).state = type;
+                  ref.read(tripSortAscendingProvider.notifier).state =
+                      ascending;
+                  Navigator.pop(context);
+                },
+              );
+            }
 
             return Column(
               mainAxisSize: MainAxisSize.min,
@@ -50,28 +72,48 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
                 const SizedBox(height: AppSpacing.m),
                 Text('Sort Options', style: AppTextStyles.h3),
                 const Divider(),
-                ListTile(
-                  leading: const HeroIcon(HeroIcons.barsArrowUp),
-                  title: const Text('Name: A to Z'),
-                  trailing: isAsc
-                      ? const HeroIcon(HeroIcons.check, color: Colors.blue)
-                      : null,
-                  onTap: () {
-                    ref.read(tripSortAscendingProvider.notifier).state = true;
-                    Navigator.pop(context);
-                  },
+
+                buildTile(
+                  icon: HeroIcons.barsArrowUp,
+                  title: 'Name: A → Z',
+                  type: TripSortType.name,
+                  ascending: true,
                 ),
-                ListTile(
-                  leading: const HeroIcon(HeroIcons.barsArrowDown),
-                  title: const Text('Name: Z to A'),
-                  trailing: !isAsc
-                      ? const HeroIcon(HeroIcons.check, color: Colors.blue)
-                      : null,
-                  onTap: () {
-                    ref.read(tripSortAscendingProvider.notifier).state = false;
-                    Navigator.pop(context);
-                  },
+                buildTile(
+                  icon: HeroIcons.barsArrowDown,
+                  title: 'Name: Z → A',
+                  type: TripSortType.name,
+                  ascending: false,
                 ),
+
+                /// RATING
+                buildTile(
+                  icon: HeroIcons.star,
+                  title: 'Rating: Low → High',
+                  type: TripSortType.rating,
+                  ascending: true,
+                ),
+                buildTile(
+                  icon: HeroIcons.star,
+                  title: 'Rating: High → Low',
+                  type: TripSortType.rating,
+                  ascending: false,
+                ),
+
+                /// VISITORS
+                buildTile(
+                  icon: HeroIcons.userGroup,
+                  title: 'Visitors: Low → High',
+                  type: TripSortType.visitors,
+                  ascending: true,
+                ),
+                buildTile(
+                  icon: HeroIcons.userGroup,
+                  title: 'Visitors: High → Low',
+                  type: TripSortType.visitors,
+                  ascending: false,
+                ),
+
                 const SizedBox(height: AppSpacing.xl),
               ],
             );
@@ -83,9 +125,7 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Watch the filtered results
     final filteredTrips = ref.watch(filteredTripsProvider);
-    final isAsc = ref.watch(tripSortAscendingProvider);
 
     return Stack(
       children: [

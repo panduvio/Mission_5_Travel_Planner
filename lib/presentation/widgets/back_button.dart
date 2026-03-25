@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:mission_5_wanderly/core/constants/app_spacing.dart';
-import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
 import 'package:mission_5_wanderly/core/extensions/theme_extension.dart';
 
 class CustomBackButton extends StatelessWidget {

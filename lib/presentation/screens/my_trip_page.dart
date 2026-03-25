@@ -7,8 +7,9 @@ import 'package:mission_5_wanderly/core/extensions/padding_extension.dart';
 import 'package:mission_5_wanderly/core/extensions/theme_extension.dart';
 import 'package:mission_5_wanderly/core/themes/app_text_styles.dart';
 import 'package:mission_5_wanderly/domain/entities/booking_entity.dart';
+import 'package:mission_5_wanderly/domain/entities/trip_entity.dart';
 import 'package:mission_5_wanderly/presentation/providers/booking_notifier.dart';
-import 'package:mission_5_wanderly/presentation/providers/trip_provider.dart';
+import 'package:mission_5_wanderly/presentation/providers/page_provider.dart';
 import 'package:mission_5_wanderly/presentation/providers/user_notifier.dart';
 import 'package:mission_5_wanderly/presentation/widgets/trip_card.dart';
 
@@ -31,27 +32,44 @@ class _MyTripPageState extends ConsumerState<MyTripPage> {
     Future.microtask(() {
       final uid = ref.read(userNotifierProvider).loginUser!.uid;
       ref.read(bookingNotifierProvider.notifier).getUserBookings(uid);
+      ref.read(bookingStatusFilterProvider.notifier).state =
+          BookingStatus.upcoming;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final filteredBookings = ref.watch(filteredBookingsProvider);
-    final status = ref.read(bookingStatusFilterProvider.notifier).state;
-    return Stack(
-      children: [
-        filteredBookings.isEmpty
-            ? _emptyBookingWidget(status)
-            : _listViewWidget(
-                filteredBookings,
-              ).paddingTBRL(100, AppSpacing.xl, AppSpacing.xl, AppSpacing.xl),
-        _floatingTabWidget(context),
-      ],
+    final tripsAsync = ref.watch(tripsProvider);
+    final status = ref.watch(bookingStatusFilterProvider);
+    return tripsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+
+      error: (e, _) => Center(child: Text('Error: $e')),
+
+      data: (trips) {
+        return Stack(
+          children: [
+            filteredBookings.isEmpty
+                ? _emptyBookingWidget(status)
+                : _listViewWidget(filteredBookings, trips).paddingTBRL(
+                    100,
+                    AppSpacing.xl,
+                    AppSpacing.xl,
+                    AppSpacing.xl,
+                  ),
+            _floatingTabWidget(context),
+          ],
+        );
+      },
     );
   }
 
-  Widget _listViewWidget(List<BookingEntity> filteredBookings) {
-    final trips = ref.read(tripListProvider);
+  Widget _listViewWidget(
+    List<BookingEntity> filteredBookings,
+    List<TripEntity> trips,
+  ) {
+    // final trips = ref.read(tripListProvider);
     return ListView.builder(
       itemCount: filteredBookings.length,
       itemBuilder: (context, index) {
@@ -122,7 +140,7 @@ class _MyTripPageState extends ConsumerState<MyTripPage> {
                           setState(() {
                             selectedIndex = index;
                           });
-                          switch (index) {
+                          switch (selectedIndex) {
                             case 0:
                               ref
                                   .read(bookingStatusFilterProvider.notifier)

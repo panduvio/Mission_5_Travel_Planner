@@ -22,4 +22,9 @@ class UserRepositoryImpl implements UserRepository {
     await _firestore.postUser(userModel);
     return unit;
   }
+
+  @override
+  Future<void> deleteUserData(String uid) async {
+    await _firestore.deleteUserData(uid);
+  }
 }

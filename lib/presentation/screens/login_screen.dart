@@ -117,7 +117,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         if (isSuccess) {
           clearAllControllers();
-          context.goNamed('home');
+
+          if (isLogin) {
+            context.goNamed('home');
+          } else {
+            setState(() {
+              isLogin = true;
+            });
+          }
         }
       }
     });
@@ -312,7 +319,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         CustomTextField(
           controller: confirmPasswordController,
-          validator: ValidatorHelper.confirmPassword(passwordController.text),
+          validator: (value) =>
+              ValidatorHelper.confirmPassword(passwordController.text, value),
           obscure: isConfirmPasswordSecure,
           prefixIcon: HeroIcons.key,
           suffixIcon: GestureDetector(
